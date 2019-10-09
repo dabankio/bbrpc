@@ -1,12 +1,7 @@
-<!--
- Copyright 2019 sunxiansong. All rights reserved.
- Use of this source code is governed by a BSD-style
- license that can be found in the LICENSE file.
--->
 
 # bbrpc
 
-BigBang blockchain RPC (bbrpc) client for golang!
+BigBang blockchain (https://github.com/bigbangcore/BigBang) RPC client for golang! BigBang RPC >> bbrpc.
 
 ## **Notice**
 

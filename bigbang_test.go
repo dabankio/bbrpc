@@ -1,8 +1,8 @@
 package bbrpc
 
 import (
-	"log"
 	"fmt"
+	"log"
 	"strings"
 	"testing"
 	"time"
@@ -19,12 +19,12 @@ func TestPOWMine(t *testing.T) {
 		killBigBangServer, err := RunBigBangServer(&RunBigBangOptions{
 			NewTmpDir:       true,
 			NotPrint2stdout: true,
-			Args:            defaultDebugBBArgs(),
+			Args:            DefaultDebugBBArgs(),
 		})
 		tShouldNil(t, err, "failed to run bigbang server")
 		defer killBigBangServer()
 
-		client, err := NewClient(defaultDebugConnConfig())
+		client, err := NewClient(DefaultDebugConnConfig())
 		tShouldNil(t, err, "failed to new rpc client")
 		defer client.Shutdown()
 
@@ -43,7 +43,7 @@ func TestPOWMine(t *testing.T) {
 
 	// time.Sleep(time.Second * 2) //debug port usage
 
-	runBBOptions := defaultDebugBBArgs()
+	runBBOptions := DefaultDebugBBArgs()
 	runBBOptions["cryptonightaddress"] = &cryptonightAddr.Address
 	runBBOptions["cryptonightkey"] = &cryptonightKey.Privkey
 
@@ -54,7 +54,7 @@ func TestPOWMine(t *testing.T) {
 	tShouldNil(t, err, "failed to run bigbang server")
 	defer killBigBangServer()
 
-	client, err := NewClient(defaultDebugConnConfig())
+	client, err := NewClient(DefaultDebugConnConfig())
 	tShouldNil(t, err, "failed to new rpc client")
 	defer client.Shutdown()
 
@@ -175,12 +175,12 @@ func TestRunMineNode(t *testing.T) {
 		killBigBangServer, err := RunBigBangServer(&RunBigBangOptions{
 			NewTmpDir:       true,
 			NotPrint2stdout: true,
-			Args:            defaultDebugBBArgs(),
+			Args:            DefaultDebugBBArgs(),
 		})
 		tShouldNil(t, err, "failed to run bigbang server")
 		defer killBigBangServer()
 
-		client, err := NewClient(defaultDebugConnConfig())
+		client, err := NewClient(DefaultDebugConnConfig())
 		tShouldNil(t, err, "failed to new rpc client")
 		defer client.Shutdown()
 
@@ -194,7 +194,7 @@ func TestRunMineNode(t *testing.T) {
 	passphrase := "123"
 	_ = passphrase
 
-	runBBOptions := defaultDebugBBArgs()
+	runBBOptions := DefaultDebugBBArgs()
 	runBBOptions["cryptonightaddress"] = &cryptonightAddr.Address
 	runBBOptions["cryptonightkey"] = &cryptonightKey.Privkey
 
@@ -205,7 +205,7 @@ func TestRunMineNode(t *testing.T) {
 	tShouldNil(t, err, "failed to run bigbang server")
 	defer killBigBangServer()
 
-	client, err := NewClient(defaultDebugConnConfig())
+	client, err := NewClient(DefaultDebugConnConfig())
 	tShouldNil(t, err, "failed to new rpc client")
 	defer client.Shutdown()
 
@@ -227,7 +227,7 @@ func TestRunMineNode(t *testing.T) {
 
 	type gotBlock struct {
 		Count int64
-		Time time.Time
+		Time  time.Time
 	}
 	gotBlocks := make([]gotBlock, 0)
 	go func() {
@@ -264,12 +264,12 @@ func TestPrepareMineAddress(t *testing.T) {
 	killBigBangServer, err := RunBigBangServer(&RunBigBangOptions{
 		NewTmpDir:       true,
 		NotPrint2stdout: true,
-		Args:            defaultDebugBBArgs(),
+		Args:            DefaultDebugBBArgs(),
 	})
 	tShouldNil(t, err, "failed to run bigbang server")
 	defer killBigBangServer()
 
-	client, err := NewClient(defaultDebugConnConfig())
+	client, err := NewClient(DefaultDebugConnConfig())
 	tShouldNil(t, err, "failed to new rpc client")
 	defer client.Shutdown()
 
@@ -288,5 +288,3 @@ func makeKeyPairAddr(c *Client, t *testing.T) AddrKeypair {
 
 	return AddrKeypair{Keypair: *k, Address: *add}
 }
-
-

@@ -6,7 +6,7 @@ import (
 )
 
 func TestClient_Version(t *testing.T) {
-	args := defaultDebugBBArgs()
+	args := DefaultDebugBBArgs()
 	killBigBangServer, err := RunBigBangServer(&RunBigBangOptions{
 		NewTmpDir: true,
 		Args:      args,
@@ -14,7 +14,7 @@ func TestClient_Version(t *testing.T) {
 	tShouldNil(t, err)
 	defer killBigBangServer()
 
-	client, err := NewClient(defaultDebugConnConfig())
+	client, err := NewClient(DefaultDebugConnConfig())
 	tShouldNil(t, err)
 
 	ver, err := client.Version()

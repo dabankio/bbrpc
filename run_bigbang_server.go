@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-// debug BigBang args
-func defaultDebugBBArgs() map[string]*string {
+// DefaultDebugBBArgs debug BigBang args
+func DefaultDebugBBArgs() map[string]*string {
 	return map[string]*string{
 		"testnet":     nil,
 		"listen4":     nil,
@@ -20,7 +20,9 @@ func defaultDebugBBArgs() map[string]*string {
 		"rpcpassword": ps("pwd"),
 	}
 }
-func defaultDebugConnConfig() *ConnConfig {
+
+// DefaultDebugConnConfig .
+func DefaultDebugConnConfig() *ConnConfig {
 	return &ConnConfig{
 		Host:       "127.0.0.1:9906",
 		DisableTLS: true,

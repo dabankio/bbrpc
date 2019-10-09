@@ -12,12 +12,12 @@ import (
 func testClientMethod(t *testing.T, testFn func(*Client)) {
 	killBigBangServer, err := RunBigBangServer(&RunBigBangOptions{
 		NewTmpDir: true,
-		Args:      defaultDebugBBArgs(),
+		Args:      DefaultDebugBBArgs(),
 	})
 	tShouldNil(t, err, "failed to run bigbang server")
 	defer killBigBangServer()
 
-	client, err := NewClient(defaultDebugConnConfig())
+	client, err := NewClient(DefaultDebugConnConfig())
 	tShouldNil(t, err, "failed to new rpc client")
 	defer client.Shutdown()
 
@@ -27,14 +27,14 @@ func testClientMethod(t *testing.T, testFn func(*Client)) {
 func TestNewClient(t *testing.T) {
 	killBigBangServer, err := RunBigBangServer(&RunBigBangOptions{
 		NewTmpDir: true,
-		Args:      defaultDebugBBArgs(),
+		Args:      DefaultDebugBBArgs(),
 	})
 	tShouldNil(t, err)
 	defer killBigBangServer()
 
 	tests := []func(){
 		func() { //正常获取版本
-			client, err := NewClient(defaultDebugConnConfig())
+			client, err := NewClient(DefaultDebugConnConfig())
 			tShouldNil(t, err)
 			defer client.Shutdown()
 
@@ -44,7 +44,7 @@ func TestNewClient(t *testing.T) {
 			tShouldTrue(t, strings.Contains(ver, "v"))
 		},
 		func() { //错误的密码
-			opts := defaultDebugConnConfig()
+			opts := DefaultDebugConnConfig()
 			opts.Pass = "bad_pass"
 
 			c, err := NewClient(opts)
