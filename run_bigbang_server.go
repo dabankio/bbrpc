@@ -14,6 +14,7 @@ func defaultDebugBBArgs() map[string]*string {
 		"testnet":     nil,
 		"listen4":     nil,
 		"debug":       nil,
+		"port":        ps("9900"),
 		"rpcport":     ps("9906"),
 		"rpcuser":     ps("rpcusr"),
 		"rpcpassword": ps("pwd"),
@@ -30,9 +31,10 @@ func defaultDebugConnConfig() *ConnConfig {
 
 // RunBigBangOptions .
 type RunBigBangOptions struct {
-	NewTmpDir       bool               //创建并使用新的临时目录作为datadir
-	Args            map[string]*string //k-v ,v 为nil时为flag
-	NotPrint2stdout bool               //不打印到stdout
+	NewTmpDir          bool               //创建并使用新的临时目录作为datadir
+	RemoveTmpDirInKill bool               //kill func中移除临时目录
+	Args               map[string]*string //k-v ,v 为nil时为flag
+	NotPrint2stdout    bool               //不打印到stdout
 }
 type killHook func() error
 
@@ -72,9 +74,11 @@ func RunBigBangServer(optionsPtr *RunBigBangOptions) (func(), error) {
 		}
 		options.Args["datadir"] = &dataDir
 
-		killHooks = append(killHooks, func() error {
-			return os.RemoveAll(dataDir)
-		})
+		if options.RemoveTmpDirInKill {
+			killHooks = append(killHooks, func() error {
+				return os.RemoveAll(dataDir)
+			})
+		}
 	}
 
 	args := []string{}
@@ -115,6 +119,9 @@ func RunBigBangServer(optionsPtr *RunBigBangOptions) (func(), error) {
 	time.Sleep(time.Millisecond * 1000)
 	return func() {
 		closeChan <- struct{}{}
+		for _, hook := range killHooks {
+			hook()
+		}
 		<-closeChan
 	}, nil
 }

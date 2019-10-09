@@ -1,6 +1,7 @@
 package bbrpc
 
 import (
+	"log"
 	"fmt"
 	"strings"
 	"testing"
@@ -14,9 +15,7 @@ func TestPOWMine(t *testing.T) {
 	passphrase := "123"
 
 	prepareAddress := func() {
-		defer func() {
-			fmt.Println("------------prepare mining data finished------------")
-		}()
+		defer fmt.Println("------------prepare mining data finished------------")
 		killBigBangServer, err := RunBigBangServer(&RunBigBangOptions{
 			NewTmpDir:       true,
 			NotPrint2stdout: true,
@@ -29,20 +28,8 @@ func TestPOWMine(t *testing.T) {
 		tShouldNil(t, err, "failed to new rpc client")
 		defer client.Shutdown()
 
-		k, err := client.Makekeypair()
-		tShouldNil(t, err)
-
-		add, err := client.Getpubkeyaddress(k.Pubkey, nil)
-		tShouldNil(t, err)
-		cryptonightAddr.Address = *add
-		cryptonightAddr.Keypair = *k
-
-		keyP, err := client.Makekeypair()
-		tShouldNil(t, err)
-		add2, err := client.Getpubkeyaddress(keyP.Pubkey, nil)
-		tShouldNil(t, err)
-		cryptonightKey.Keypair = *keyP
-		cryptonightKey.Address = *add2
+		cryptonightAddr = makeKeyPairAddr(client, t)
+		cryptonightKey = makeKeyPairAddr(client, t)
 
 		tShouldNotZero(t, cryptonightAddr.Address)
 		tShouldNotZero(t, cryptonightAddr.Privkey)
@@ -178,3 +165,128 @@ func TestPOWMine(t *testing.T) {
 func TestTransaction(t *testing.T) {
 
 }
+
+func TestRunMineNode(t *testing.T) {
+	cryptonightAddr := AddrKeypair{}
+	cryptonightKey := AddrKeypair{}
+
+	prepareAddress := func() {
+		defer fmt.Println("------------prepare mining data finished------------")
+		killBigBangServer, err := RunBigBangServer(&RunBigBangOptions{
+			NewTmpDir:       true,
+			NotPrint2stdout: true,
+			Args:            defaultDebugBBArgs(),
+		})
+		tShouldNil(t, err, "failed to run bigbang server")
+		defer killBigBangServer()
+
+		client, err := NewClient(defaultDebugConnConfig())
+		tShouldNil(t, err, "failed to new rpc client")
+		defer client.Shutdown()
+
+		cryptonightAddr = makeKeyPairAddr(client, t)
+		cryptonightKey = makeKeyPairAddr(client, t)
+	}
+
+	prepareAddress()
+
+	// time.Sleep(time.Second * 2) //debug port usage
+	passphrase := "123"
+	_ = passphrase
+
+	runBBOptions := defaultDebugBBArgs()
+	runBBOptions["cryptonightaddress"] = &cryptonightAddr.Address
+	runBBOptions["cryptonightkey"] = &cryptonightKey.Privkey
+
+	killBigBangServer, err := RunBigBangServer(&RunBigBangOptions{
+		NewTmpDir: true,
+		Args:      runBBOptions,
+	})
+	tShouldNil(t, err, "failed to run bigbang server")
+	defer killBigBangServer()
+
+	client, err := NewClient(defaultDebugConnConfig())
+	tShouldNil(t, err, "failed to new rpc client")
+	defer client.Shutdown()
+
+	// _, err = client.Importprivkey(cryptonightAddr.Privkey, passphrase)
+	// tShouldNil(t, err)
+	// _, err = client.Importprivkey(cryptonightKey.Privkey, passphrase)
+	// tShouldNil(t, err)
+
+	templateAddress, err := client.Addnewtemplate(AddnewtemplateParamMint{
+		Mint:  cryptonightKey.Pubkey,
+		Spent: cryptonightAddr.Address,
+	})
+	tShouldNil(t, err)
+	fmt.Println("mint template address", *templateAddress)
+
+	ticker := time.NewTicker(time.Second * 5)
+	defer ticker.Stop()
+	tickerDone := make(chan bool)
+
+	type gotBlock struct {
+		Count int64
+		Time time.Time
+	}
+	gotBlocks := make([]gotBlock, 0)
+	go func() {
+		for {
+		slct:
+			select {
+			case <-tickerDone:
+				fmt.Println("Done!")
+				return
+			case tm := <-ticker.C:
+				count, err := client.Getblockcount(nil)
+				tShouldNil(t, err)
+
+				for _, b := range gotBlocks {
+					if b.Count == *count {
+						break slct
+					}
+				}
+				gotBlocks = append(gotBlocks, gotBlock{*count, tm})
+				log.Println("[blockcount]", toJSONIndent(gotBlocks))
+
+				bal, err := client.Getbalance(nil, nil)
+				tShouldNil(t, err)
+				log.Println("balance", toJSONIndent(bal))
+			}
+		}
+	}()
+
+	time.Sleep(time.Minute * 1)
+	tickerDone <- true
+}
+
+func TestPrepareMineAddress(t *testing.T) {
+	killBigBangServer, err := RunBigBangServer(&RunBigBangOptions{
+		NewTmpDir:       true,
+		NotPrint2stdout: true,
+		Args:            defaultDebugBBArgs(),
+	})
+	tShouldNil(t, err, "failed to run bigbang server")
+	defer killBigBangServer()
+
+	client, err := NewClient(defaultDebugConnConfig())
+	tShouldNil(t, err, "failed to new rpc client")
+	defer client.Shutdown()
+
+	a0 := makeKeyPairAddr(client, t)
+	a1 := makeKeyPairAddr(client, t)
+
+	fmt.Println(toJSONIndent(a0), toJSONIndent(a1))
+}
+
+func makeKeyPairAddr(c *Client, t *testing.T) AddrKeypair {
+	k, err := c.Makekeypair()
+	tShouldNil(t, err)
+
+	add, err := c.Getpubkeyaddress(k.Pubkey, nil)
+	tShouldNil(t, err)
+
+	return AddrKeypair{Keypair: *k, Address: *add}
+}
+
+

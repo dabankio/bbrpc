@@ -12,7 +12,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 	"sync"
 	"sync/atomic"
 )
@@ -135,11 +134,13 @@ func (c *Client) sendPost(jReq *jsonRequest) {
 		jReq.responseChan <- &response{result: nil, err: err}
 		return
 	}
-	httpReq.Close = true
+	// httpReq.Close = true
 	httpReq.Header.Set("Content-Type", "application/json")
 
-	// Configure basic access authorization.
-	httpReq.SetBasicAuth(c.config.User, c.config.Pass)
+	if c.config.User != "" {
+		// Configure basic access authorization.
+		httpReq.SetBasicAuth(c.config.User, c.config.Pass)
+	}
 
 	log.Printf("Sending command [%s] with id %d", jReq.method, jReq.id)
 
@@ -159,7 +160,7 @@ func (c *Client) sendPost(jReq *jsonRequest) {
 // proxy and TLS settings in the associated connection configuration.
 func newHTTPClient(config *ConnConfig) (*http.Client, error) {
 	// Set proxy function if there is a proxy configured.
-	var proxyFunc func(*http.Request) (*url.URL, error)
+	// var proxyFunc func(*http.Request) (*url.URL, error)
 	// Configure TLS if needed.
 	var tlsConfig *tls.Config
 	if !config.DisableTLS {
@@ -174,7 +175,7 @@ func newHTTPClient(config *ConnConfig) (*http.Client, error) {
 
 	client := http.Client{
 		Transport: &http.Transport{
-			Proxy:           proxyFunc,
+			// Proxy:           proxyFunc,
 			TLSClientConfig: tlsConfig,
 		},
 	}
