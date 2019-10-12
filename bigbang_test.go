@@ -173,7 +173,6 @@ func makeKeyPairAddr(c *Client, t *testing.T) AddrKeypair {
 // 使用0-5地址
 // 给0转入3资金，每笔15
 // 0 transfer to 1, 32
-
 func TestMultiVinTx(t *testing.T) {
 	killBigBangServer, client, mintTplAddress := tRunBigbangServerAndBeginMint(t)
 	defer killBigBangServer()
@@ -216,7 +215,7 @@ func TestMultiVinTx(t *testing.T) {
 
 	hash1, err := client.Getblockhash(1, nil)
 	tShouldNil(t, err)
-	txs, err := client.ListTransactionsSinceBlock(hash1[0])
+	_, txs, err := client.ListTransactionsSinceBlock(hash1[0])
 	tShouldNil(t, err)
 	fmt.Println("tx...", toJSONIndent(txs))
 
