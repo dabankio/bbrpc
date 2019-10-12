@@ -4,17 +4,10 @@ import (
 	"encoding/json"
 )
 
-func toJSONIndent(v interface{}) string {
-	b, _ := json.MarshalIndent(v, "", "  ")
-	return string(b)
-}
+func toJSONIndent(v interface{}) string { b, _ := json.MarshalIndent(v, "", "  "); return string(b) }
 
-// pointer of string
-func ps(s string) *string {
-	return &s
-}
-
-// pointer of bool
-func pbool(b bool) *bool {
-	return &b
-}
+func ps(s string) *string      { return &s }
+func pbool(b bool) *bool       { return &b }
+func puint(i uint) *uint       { return &i }
+func pstring(s string) *string { return &s }
+func pint(i int) *int          { return &i }

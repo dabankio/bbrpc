@@ -27,9 +27,9 @@ func (c *Client) Getblock(hash string) (*BlockInfo, error) {
 }
 
 // Getblockhash https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#getblockhash
-func (c *Client) Getblockhash(height int64, fork *string) ([]string, error) {
+func (c *Client) Getblockhash(height int, fork *string) ([]string, error) {
 	resp, err := c.sendCmd("getblockhash", struct {
-		Height int64   `json:"height"`
+		Height int     `json:"height"`
 		Fork   *string `json:"fork,omitempty"`
 	}{Height: height, Fork: fork})
 	if err != nil {

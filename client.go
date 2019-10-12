@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"sync"
 	"sync/atomic"
+	"time"
 )
 
 const (
@@ -174,6 +175,7 @@ func newHTTPClient(config *ConnConfig) (*http.Client, error) {
 	}
 
 	client := http.Client{
+		Timeout: time.Second * 15,
 		Transport: &http.Transport{
 			// Proxy:           proxyFunc,
 			TLSClientConfig: tlsConfig,
