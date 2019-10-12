@@ -162,9 +162,9 @@ func (c *Client) Validateaddress(addr string) (*AddressInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	var info *AddressInfo
-	err = futureParse(resp, info)
-	return info, err
+	var info AddressInfo
+	err = futureParse(resp, &info)
+	return &info, err
 }
 
 // Unlockkey https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#unlockkey

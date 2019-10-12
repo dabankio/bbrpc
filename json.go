@@ -105,7 +105,7 @@ type AddressData struct {
 type AddressInfo struct {
 	Isvalid bool `json:"isvalid,omitempty"` //": true|false,               (bool, required) is valid
 	//    (if isvalid=true)
-	Addressdata *AddressInfo `json:"addressdata,omitempty"` //(object, required) address data
+	Addressdata *AddressData `json:"addressdata,omitempty"` //(object, required) address data
 }
 
 // AddnewtemplateParam .

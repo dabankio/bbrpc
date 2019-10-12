@@ -6,6 +6,8 @@ import (
 )
 
 func TestViewTestnet(t *testing.T) {
+	t.SkipNow()
+
 	client, err := NewClient(&ConnConfig{
 		Host:       "127.0.0.1:9904",
 		DisableTLS: true,
