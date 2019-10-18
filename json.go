@@ -215,3 +215,17 @@ type VinPoint struct {
 	Txid string `json:"txid,omitempty"` //(string, required) pre-vout transaction hash
 	Vout uint   `json:"vout,omitempty"` //(uint, required) pre-vout number
 }
+
+// PeerInfo .
+type PeerInfo struct {
+	Address  string `json:"address,omitempty"`  //(string, required) peer address
+	Services string `json:"services,omitempty"` //(string, required) service
+	Lastsend int    `json:"lastsend,omitempty"` //(int, required) last send time
+	Lastrecv int    `json:"lastrecv,omitempty"` //(int, required) last receive time
+	Conntime int    `json:"conntime,omitempty"` //(int, required) active time
+	Version  string `json:"version,omitempty"`  //(string, required) version
+	Subver   string `json:"subver,omitempty"`   //(string, required) sub version
+	Inbound  bool   `json:"inbound,omitempty"`  //(bool, required) accept multiple connection or not
+	Height   int    `json:"height,omitempty"`   //(int, required) starting height
+	Banscore int    `json:"banscore,omitempty"` //(int, required) ban score
+}

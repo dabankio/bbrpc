@@ -9,6 +9,7 @@ import (
 )
 
 // DefaultDebugBBArgs debug BigBang args
+// testnet,listen4,debug,port=9900,rpcport=9906,rpcuser=rpcusr,rpcpassword=pwd
 func DefaultDebugBBArgs() map[string]*string {
 	return map[string]*string{
 		"testnet":     nil,

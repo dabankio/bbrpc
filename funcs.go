@@ -11,3 +11,6 @@ func pbool(b bool) *bool       { return &b }
 func puint(i uint) *uint       { return &i }
 func pstring(s string) *string { return &s }
 func pint(i int) *int          { return &i }
+
+// Pstring .
+func Pstring(s string) *string { return &s }
