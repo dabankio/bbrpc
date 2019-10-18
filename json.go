@@ -121,14 +121,10 @@ type AddnewtemplateParamMint struct {
 }
 
 // TemplateType .
-func (p AddnewtemplateParamMint) TemplateType() string {
-	return "mint"
-}
+func (p AddnewtemplateParamMint) TemplateType() string { return "mint" }
 
 // ParamName .
-func (p AddnewtemplateParamMint) ParamName() string {
-	return "mint"
-}
+func (p AddnewtemplateParamMint) ParamName() string { return "mint" }
 
 // ForkProfile .
 type ForkProfile struct {

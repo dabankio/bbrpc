@@ -34,6 +34,7 @@ func DefaultDebugConnConfig() *ConnConfig {
 // RunBigBangOptions .
 type RunBigBangOptions struct {
 	NewTmpDir          bool               //创建并使用新的临时目录作为datadir
+	TmpDirTag          string             //tag会作为临时路径的前缀
 	RemoveTmpDirInKill bool               //kill func中移除临时目录
 	Args               map[string]*string //k-v ,v 为nil时为flag
 	NotPrint2stdout    bool               //不打印到stdout
@@ -68,8 +69,11 @@ func RunBigBangServer(optionsPtr *RunBigBangOptions) (func(), error) {
 			}
 		}
 
+		tag := strings.TrimLeft(options.TmpDirTag, "/")
+		rfc3339Variant := "20060102_150405"
 		tmpDir := strings.TrimRight(os.TempDir(), "/")
-		dataDir = tmpDir + "/bigbang_data_tmp_" + time.Now().Format(time.RFC3339) + "/"
+
+		dataDir = tmpDir + "/" + tag + "bbc_data_tmp_" + time.Now().Format(rfc3339Variant) + "/"
 		err := os.MkdirAll(dataDir, 0777)
 		if err != nil {
 			return nil, fmt.Errorf("cannot create tmp dir: %v, err: %v", dataDir, err)

@@ -130,7 +130,7 @@ func (c *Client) sendPost(jReq *jsonRequest) {
 	}
 	url := protocol + "://" + c.config.Host
 	bodyReader := bytes.NewReader(jReq.marshalledJSON)
-	httpReq, err := http.NewRequest("POST", url, bodyReader)
+	httpReq, err := http.NewRequest(http.MethodPost, url, bodyReader)
 	if err != nil {
 		jReq.responseChan <- &response{result: nil, err: err}
 		return
@@ -324,7 +324,11 @@ func futureParse(f chan *response, v interface{}) error {
 	if r.err != nil {
 		return fmt.Errorf("RPC request return error: %v", r.err)
 	}
-	return json.Unmarshal(r.result, v)
+	err := json.Unmarshal(r.result, v)
+	if err != nil {
+		err = fmt.Errorf("failed to parse rpc json response %s to %t, %v", string(r.result), v, err)
+	}
+	return err
 }
 
 // sendCmd sends the passed command to the associated server and returns a
