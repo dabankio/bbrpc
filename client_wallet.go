@@ -29,6 +29,9 @@ func (c *Client) Createtransaction(cmd CmdCreatetransaction) (*string, error) {
 
 // Getbalance https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#getbalance
 func (c *Client) Getbalance(fork *string, address *string) ([]BalanceInfo, error) {
+	if address != nil  && *address == "" {
+		address = nil
+	}
 	resp, err := c.sendCmd("getbalance", struct {
 		Fork    *string `json:"fork,omitempty"`
 		Address *string `json:"address,omitempty"`
