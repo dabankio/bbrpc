@@ -61,6 +61,13 @@ api 参考 https://github.com/bigbangcore/BigBang/wiki/JSON-RPC
     - 暂时没有考虑`t.Parallel()`,这个需要对测试端口进行无冲突的管理分配
     - 启动bigbang后会等待1s
 
+## PR
+该项目非bigbang核心团队实现，作者根据自己的需求实现了部分RPC。但代码设计成容易的添加新的RPC,只需要简单的添加数据结构(基本参考官方RPC Wiki)，参考现有的代码即可快速实现。
+
+欢迎提交PR.
+
 ## LICENSE
 
 TBD
+
+(目前暂时没有限制，你可以按照你喜欢的方式使用代码)
