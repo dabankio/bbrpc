@@ -143,7 +143,7 @@ func (c *Client) sendPost(jReq *jsonRequest) {
 		httpReq.SetBasicAuth(c.config.User, c.config.Pass)
 	}
 
-	log.Printf("Sending command [%s] with id %d", jReq.method, jReq.id)
+	// log.Printf("Sending command [%s] with id %d", jReq.method, jReq.id)
 
 	select {
 	case <-c.shutdown:
@@ -226,7 +226,7 @@ cleanup:
 // provided response channel.
 func (c *Client) handleSendPostMessage(details *sendPostDetails) {
 	jReq := details.jsonRequest
-	log.Printf("Sending post [%s] with id %d, json: %s", jReq.method, jReq.id, string(jReq.marshalledJSON))
+	// log.Printf("Sending post [%s] with id %d, json: %s", jReq.method, jReq.id, string(jReq.marshalledJSON))
 	httpResponse, err := c.httpClient.Do(details.httpRequest)
 	if err != nil {
 		jReq.responseChan <- &response{err: err}
