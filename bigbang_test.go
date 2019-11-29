@@ -218,7 +218,7 @@ func TestMultiVinTx(t *testing.T) {
 
 	hash1, err := client.Getblockhash(1, nil)
 	tShouldNil(t, err)
-	_, txs, err := client.ListTransactionsSinceBlock(hash1[0])
+	_, txs, err := client.ListTransactionsSinceBlock(hash1[0], 10)
 	tShouldNil(t, err)
 	fmt.Println("tx...", toJSONIndent(txs))
 
