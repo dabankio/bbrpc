@@ -36,3 +36,39 @@ func TestJSONUnmarshal(t *testing.T) {
 	tShouldNil(t, err)
 	fmt.Println(toJSONIndent(info))
 }
+
+func TestClient_Exportkey(t *testing.T) {
+	testClientMethod(t, func(c *Client) {
+		p, err := c.Makekeypair()
+		tShouldNil(t, err)
+
+		fmt.Printf("pair: %#v\n", p)
+
+		_, err = c.Importprivkey(p.Privkey, "123")
+		tShouldNil(t, err)
+
+		key, err := c.Exportkey(p.Pubkey)
+		tShouldNil(t, err)
+		fmt.Println("export key:", key)
+	})
+}
+
+func TestClient_Importkey(t *testing.T) {
+	testClientMethod(t, func(c *Client) {
+		// pair: &bbrpc.Keypair{Privkey:"52b18397cfe2464d80df629ea35050a34f51379d1a38f39a94f8838f2b731b66", Pubkey:"56005784cf72f3a4e228e7dd4459f3c00e69ea731d8d4b07327d4d619fc37909"}
+		// export key: 0979c39f614d7d32074b8d1d73ea690ec0f35944dde728e2a4f372cf8457005601000000aaca6c71d4f72cbad55ae8a698f813deb2f8d6706db8114a3c6f7553790142f869c79867b5c1fb33ea0946747400c9f90c271b1f35061026cd2c82c0
+
+		pubkey := "0979c39f614d7d32074b8d1d73ea690ec0f35944dde728e2a4f372cf8457005601000000aaca6c71d4f72cbad55ae8a698f813deb2f8d6706db8114a3c6f7553790142f869c79867b5c1fb33ea0946747400c9f90c271b1f35061026cd2c82c0"
+		key, err := c.Importkey(pubkey)
+		tShouldNil(t, err)
+		fmt.Println("importkey ", key, err)
+
+		keys, err := c.Listkey()
+		tShouldNil(t, err)
+		fmt.Printf("listkeys %#v\n", keys)
+
+		ret, err := c.Unlockkey(keys[0].Key, "123", nil)
+		tShouldNil(t, err)
+		fmt.Println("unlock ret:", *ret)
+	})
+}

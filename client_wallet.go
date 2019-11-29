@@ -27,9 +27,22 @@ func (c *Client) Createtransaction(cmd CmdCreatetransaction) (*string, error) {
 	return &txdata, err
 }
 
+// Exportkey https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#exportkey
+func (c *Client) Exportkey(pubkey string) (string, error) {
+	resp, err := c.sendCmd("exportkey", struct {
+		Pubkey string `json:"pubkey"`
+	}{pubkey})
+	if err != nil {
+		return "", err
+	}
+	var key string
+	err = futureParse(resp, &key)
+	return key, err
+}
+
 // Getbalance https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#getbalance
 func (c *Client) Getbalance(fork *string, address *string) ([]BalanceInfo, error) {
-	if address != nil  && *address == "" {
+	if address != nil && *address == "" {
 		address = nil
 	}
 	resp, err := c.sendCmd("getbalance", struct {
@@ -69,6 +82,19 @@ func (c *Client) Gettransaction(txid string, serialized *bool) (*TransactionDeta
 	var detail TransactionDetail
 	err = futureParse(resp, &detail)
 	return &detail, err
+}
+
+// Importkey https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#importkey
+func (c *Client) Importkey(pubkey string) (string, error) {
+	resp, err := c.sendCmd("importkey", struct {
+		Pubkey string `json:"pubkey"`
+	}{pubkey})
+	if err != nil {
+		return "", err
+	}
+	var key string
+	err = futureParse(resp, &key)
+	return key, err
 }
 
 // Importprivkey https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#importprivkey

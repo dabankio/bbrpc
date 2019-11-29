@@ -152,11 +152,14 @@ func TestPrepare2Address(t *testing.T) {
 	tShouldNil(t, err, "failed to new rpc client")
 	defer client.Shutdown()
 
-	a0 := makeKeyPairAddr(client, t)
-	a1 := makeKeyPairAddr(client, t)
-
-	fmt.Println(toJSONIndent(a0), toJSONIndent(a1))
-	fmt.Printf("%#v\n%#v\n", a0, a1)
+	var addrs []AddrKeypair
+	for i := 0; i < 4; i++ {
+		a := makeKeyPairAddr(client, t)
+		addrs = append(addrs, a)
+	}
+	for _, a := range addrs {
+		fmt.Printf("%#v\n", a)
+	}
 }
 
 func makeKeyPairAddr(c *Client, t *testing.T) AddrKeypair {
