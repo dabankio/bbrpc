@@ -220,9 +220,10 @@ type VinPoint struct {
 type PeerInfo struct {
 	Address  string `json:"address,omitempty"`  //(string, required) peer address
 	Services string `json:"services,omitempty"` //(string, required) service
-	Lastsend int    `json:"lastsend,omitempty"` //(int, required) last send time
-	Lastrecv int    `json:"lastrecv,omitempty"` //(int, required) last receive time
-	Conntime int    `json:"conntime,omitempty"` //(int, required) active time
+	Lastsend string `json:"lastsend,omitempty"` //(int, required) last send time
+	Lastrecv string `json:"lastrecv,omitempty"` //(int, required) last receive time
+	Conntime string `json:"conntime,omitempty"` //(int, required) active time
+	Pingtime int    `json:"pingtime"`           //(int, required) ping pong time
 	Version  string `json:"version,omitempty"`  //(string, required) version
 	Subver   string `json:"subver,omitempty"`   //(string, required) sub version
 	Inbound  bool   `json:"inbound,omitempty"`  //(bool, required) accept multiple connection or not

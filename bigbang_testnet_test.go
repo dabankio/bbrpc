@@ -8,6 +8,8 @@ import (
 
 // 测试链上的出块间隔
 func TestTestnetBockPeriod(t *testing.T) {
+	t.Skip("需要的话自行搭建节点测试")
+
 	client, err := NewClient(&ConnConfig{
 		Host:       "127.0.0.1:9904",
 		DisableTLS: true,
@@ -52,7 +54,7 @@ func TestTestnetBockPeriod(t *testing.T) {
 	}
 }
 func TestViewTestnet(t *testing.T) {
-	t.SkipNow()
+	t.Skip("自行测试")
 
 	client, err := NewClient(&ConnConfig{
 		Host:       "127.0.0.1:9904",

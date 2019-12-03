@@ -1,10 +1,12 @@
 package bbrpc
 
 import (
+	"log"
 	"reflect"
 	"runtime/debug"
 	"strings"
 	"testing"
+	"time"
 )
 
 func tShouldNil(t *testing.T, v interface{}, args ...interface{}) {
@@ -76,4 +78,9 @@ func tRunBigbangServerAndBeginMint(t *testing.T) (func(), *Client, string) {
 		killBigBangServer()
 		client.Shutdown()
 	}, client, *templateAddress
+}
+
+func tWait4mine(msg ...string) {
+	log.Println("wait for mine", msg)
+	time.Sleep(time.Second * 8)
 }

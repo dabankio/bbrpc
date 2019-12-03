@@ -30,3 +30,23 @@ func TestClient_Getblockcount(t *testing.T) {
 		fmt.Println("block count:", *count)
 	})
 }
+
+func TestClient_Getblock_Getblockhash_Getforkheight_Listfork(t *testing.T) {
+	testClientMethod(t, func(c *Client) {
+		tWait4mine()
+
+		h, err := c.Getforkheight(nil)
+		tShouldNil(t, err)
+
+		ha, err := c.Getblockhash(int(h), nil)
+		tShouldNil(t, err)
+
+		b, err := c.Getblock(ha[0])
+		tShouldNil(t, err)
+		fmt.Println("block", toJSONIndent(b))
+
+		forks, err := c.Listfork(true)
+		tShouldNil(t, err)
+		fmt.Println("forks", toJSONIndent(forks))
+	})
+}
