@@ -63,3 +63,16 @@ func (c *Client) Listfork(all bool) (ret []ForkProfile, err error) {
 	err = futureParse(resp, &ret)
 	return
 }
+
+// Sendtransaction https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#sendtransaction
+func (c *Client) Sendtransaction(txdata string) (*string, error) {
+	resp, err := c.sendCmd("sendtransaction", struct {
+		Txdata string `json:"txdata"`
+	}{Txdata: txdata})
+	if err != nil {
+		return nil, err
+	}
+	var txid string
+	err = futureParse(resp, &txid)
+	return &txid, err
+}

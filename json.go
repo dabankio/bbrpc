@@ -66,8 +66,8 @@ type TemplateData struct {
 	} `json:"mint,omitempty"`
 	//   (if type=multisig)
 	Multisig *struct { //(object, required) multisig template struct
-		Required int64    `json:"required,omitempty"` //(int, required) required weight
-		Keys     []string `json:"keys,omitempty"`     //(string, required) public key
+		Required  int64    `json:"required,omitempty"`  //(int, required) required weight
+		Addresses []string `json:"addresses,omitempty"` //(string, required) public key
 	} `json:"multisig,omitempty"`
 	//   (if type=exchange)
 	Exchange *struct { //(object, required) exchange template struct
@@ -125,6 +125,18 @@ func (p AddnewtemplateParamMint) TemplateType() string { return "mint" }
 
 // ParamName .
 func (p AddnewtemplateParamMint) ParamName() string { return "mint" }
+
+// AddnewtemplateParamMultisig .
+type AddnewtemplateParamMultisig struct {
+	Required int      `json:"required,omitempty"`
+	Pubkeys  []string `json:"pubkeys,omitempty"`
+}
+
+// TemplateType .
+func (p AddnewtemplateParamMultisig) TemplateType() string { return "multisig" }
+
+// ParamName .
+func (p AddnewtemplateParamMultisig) ParamName() string { return "multisig" }
 
 // ForkProfile .
 type ForkProfile struct {

@@ -111,6 +111,19 @@ func (c *Client) Importprivkey(privkey, passphrase string) (*string, error) {
 	return &pubkey, err
 }
 
+// Importtemplate https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#importtemplate
+func (c *Client) Importtemplate(data string) (*string, error) {
+	resp, err := c.sendCmd("importtemplate", struct {
+		Data string `json:"data"`
+	}{data})
+	if err != nil {
+		return nil, err
+	}
+	var address string
+	err = futureParse(resp, &address)
+	return &address, err
+}
+
 // Listaddress https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#listaddress
 func (c *Client) Listaddress() ([]AddressData, error) {
 	resp, err := c.sendCmd("listaddress", nil)
@@ -118,7 +131,7 @@ func (c *Client) Listaddress() ([]AddressData, error) {
 		return nil, err
 	}
 	var data []AddressData
-	err = futureParse(resp, data)
+	err = futureParse(resp, &data)
 	return data, err
 }
 

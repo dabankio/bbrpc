@@ -8,22 +8,6 @@ import (
 	"testing"
 )
 
-// 启动bigbang-server,创建一个client,调用testFn(client)
-func testClientMethod(t *testing.T, testFn func(*Client)) {
-	killBigBangServer, err := RunBigBangServer(&RunBigBangOptions{
-		NewTmpDir: true,
-		Args:      DefaultDebugBBArgs(),
-	})
-	tShouldNil(t, err, "failed to run bigbang server")
-	defer killBigBangServer()
-
-	client, err := NewClient(DefaultDebugConnConfig())
-	tShouldNil(t, err, "failed to new rpc client")
-	defer client.Shutdown()
-
-	testFn(client)
-}
-
 func TestNewClient(t *testing.T) {
 	killBigBangServer, err := RunBigBangServer(&RunBigBangOptions{
 		NewTmpDir: true,

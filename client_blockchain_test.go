@@ -33,7 +33,7 @@ func TestClient_Getblockcount(t *testing.T) {
 
 func TestClient_Getblock_Getblockhash_Getforkheight_Listfork(t *testing.T) {
 	testClientMethod(t, func(c *Client) {
-		tWait4mine()
+		Wait4nBlocks(1, c)
 
 		h, err := c.Getforkheight(nil)
 		tShouldNil(t, err)

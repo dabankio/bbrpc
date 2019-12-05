@@ -9,14 +9,14 @@ import (
 
 // 测试pow挖矿,简单挖矿并列出余额
 func TestPOWMine(t *testing.T) {
-	killBigBangServer, client, templateAddress := tRunBigbangServerAndBeginMint(t)
+	killBigBangServer, client, templateAddress := TesttoolRunServerAndBeginMint(t)
 	defer killBigBangServer()
 
 	listk, err := client.Listkey()
 	tShouldNil(t, err)
 	tShouldTrue(t, len(listk) == 2, listk)
 
-	tWait4mine()
+	Wait4nBlocks(1, client)
 
 	balance, err := client.Getbalance(nil, nil)
 	tShouldNil(t, err)
@@ -42,7 +42,7 @@ func TestPOWMine(t *testing.T) {
 		tShouldNil(t, err)
 		fmt.Println("sendfrom txid", *txid)
 	}
-	tWait4mine()
+	Wait4nBlocks(1, client)
 
 	forkHeight, err := client.Getforkheight(nil)
 	tShouldNil(t, err)
@@ -96,7 +96,7 @@ func TestPOWMine(t *testing.T) {
 
 // 挖矿，不停的打印blockcount和balance
 func TestRunMineNode(t *testing.T) {
-	killBigBangServer, client, _ := tRunBigbangServerAndBeginMint(t)
+	killBigBangServer, client, _ := TesttoolRunServerAndBeginMint(t)
 	defer killBigBangServer()
 
 	ticker := time.NewTicker(time.Second * 5)
@@ -177,11 +177,10 @@ func makeKeyPairAddr(c *Client, t *testing.T) AddrKeypair {
 // 给0转入3资金，每笔15
 // 0 transfer to 1, 32
 func TestMultiVinTx(t *testing.T) {
-	killBigBangServer, client, mintTplAddress := tRunBigbangServerAndBeginMint(t)
+	killBigBangServer, client, mintTplAddress := TesttoolRunServerAndBeginMint(t)
 	defer killBigBangServer()
 
-	tWait4mine()
-	tWait4mine()
+	Wait4nBlocks(1, client)
 
 	for _, k := range []AddrKeypair{tAddr0, tAddr1} {
 		ret, err := client.Importprivkey(k.Privkey, _tPassphrase)
@@ -205,7 +204,7 @@ func TestMultiVinTx(t *testing.T) {
 		tShouldTrue(t, txid != nil)
 	}
 
-	tWait4mine()
+	Wait4nBlocks(1, client)
 
 	{ // 0 transfer to 1
 		txid, err := client.Sendfrom(CmdSendfrom{
@@ -215,7 +214,7 @@ func TestMultiVinTx(t *testing.T) {
 		tShouldTrue(t, txid != nil)
 	}
 
-	tWait4mine()
+	Wait4nBlocks(1, client)
 
 	bal, err := client.Getbalance(nil, nil)
 	tShouldNil(t, err)
@@ -239,10 +238,10 @@ func TestMultiVinTx(t *testing.T) {
 // 计算出块间隔
 // 结论：基于1.0.0版本，大部分在3s内，少部分最多30s
 func TestBlockTime(t *testing.T) {
-	killBigBangServer, client, mintTplAddress := tRunBigbangServerAndBeginMint(t)
+	killBigBangServer, client, mintTplAddress := TesttoolRunServerAndBeginMint(t)
 	defer killBigBangServer()
 
-	time.Sleep(time.Minute * 1)
+	Wait4nBlocks(5, client)
 
 	balOfMiner, err := client.Getbalance(nil, &mintTplAddress)
 	tShouldNil(t, err)
@@ -272,7 +271,256 @@ func TestBlockTime(t *testing.T) {
 	}
 }
 
+// 测试单个节点2个地址的多重签名
+func TestMultisigSingleNode(t *testing.T) {
+	killBigBangServer, client, minerAddress := TesttoolRunServerAndBeginMint(t)
+	defer killBigBangServer()
+
+	tShouldNil(t, Wait4balanceReach(minerAddress, 100, client))
+
+	// 使用2个地址，产生一个多签地址
+	// 将资金转入多签地址
+	// 从多签地址将资金转出
+	a0, a1, a2 := tAddr0, tAddr1, tAddr2
+	for _, a := range []AddrKeypair{a0, a1, a2} {
+		_, err := client.Importprivkey(a.Privkey, _tPassphrase)
+		tShouldNil(t, err)
+
+		_, err = client.Unlockkey(a.Pubkey, _tPassphrase, nil)
+		tShouldNil(t, err)
+	}
+
+	tplAddr, err := client.Addnewtemplate(AddnewtemplateParamMultisig{
+		Required: 2,
+		Pubkeys:  []string{a0.Pubkey, a1.Pubkey},
+	})
+	tShouldNil(t, err)
+	tShouldNotZero(t, tplAddr)
+	fmt.Println("multisig tpl addr:", *tplAddr)
+
+	vret, err := client.Validateaddress(*tplAddr)
+	tShouldNil(t, err)
+	tShouldNotZero(t, vret)
+	fmt.Println("tpl addr:", toJSONIndent(*vret))
+
+	amount := 99.0
+	_, err = client.Sendfrom(CmdSendfrom{
+		To:     *tplAddr,
+		From:   minerAddress,
+		Amount: amount,
+	})
+	tShouldNil(t, err)
+	tShouldNil(t, Wait4balanceReach(*tplAddr, amount, client))
+
+	fromMultisigAmount := 12.3
+	_, err = client.Sendfrom(CmdSendfrom{
+		To:     a2.Address,
+		From:   *tplAddr,
+		Amount: fromMultisigAmount,
+	})
+	tShouldNil(t, err)
+
+	tShouldNil(t, Wait4balanceReach(a2.Address, fromMultisigAmount, client))
+
+	list, err := client.Listaddress()
+	tShouldNil(t, err)
+	fmt.Printf("addrs: %v\n", list)
+}
+
+// 测试2个节点的多重签名(分别持有私钥1个)
+func TestMultisigDoubleNode(t *testing.T) {
+	// 2个节点，组成网络，其中1个挖矿
+	// 每个节点导入1个私钥A/B
+	// 创建多签模版
+	// 2个节点确保导入模版
+	// 往模版转入资金
+	// 创建转出交易，2个节点顺序签名
+	// 广播交易，等待确认
+
+	killCluster, nodes := TesttoolRunClusterWith2nodes(t)
+	defer killCluster()
+
+	// fmt.Println("miner:", nodes[0].MinerAddress)
+	n0, n1 := nodes[0], nodes[1]
+	a0, a1 := tAddr0, tAddr1
+
+	{ //2个节点分别导入地址
+		for _, imp := range []struct {
+			node ClusterNode
+			add  AddrKeypair
+		}{{n0, a0}, {n1, a1}} {
+			_, err := imp.node.Client.Importprivkey(imp.add.Privkey, _tPassphrase)
+			tShouldNil(t, err)
+
+			_, err = imp.node.Client.Unlockkey(imp.add.Pubkey, _tPassphrase, nil)
+			tShouldNil(t, err)
+		}
+	}
+
+	var tplAddr *string
+	var err error
+	{ //创建多签模版，2个节点确保导入
+		tplAddr, err = n0.Client.Addnewtemplate(AddnewtemplateParamMultisig{
+			Required: 2,
+			Pubkeys:  []string{a0.Pubkey, a1.Pubkey},
+		})
+		tShouldNil(t, err)
+		tShouldNotZero(t, tplAddr)
+		fmt.Println("multisig tpl addr:", *tplAddr)
+
+		vret, err := n0.Client.Validateaddress(*tplAddr)
+		tShouldNil(t, err)
+		tShouldNotZero(t, vret)
+		fmt.Println("tpl addr:", toJSONIndent(*vret))
+
+		importedTplAddr, err := n1.Client.Importtemplate(vret.Addressdata.Templatedata.Hex)
+		tShouldNil(t, err)
+		tShouldTrue(t, *tplAddr == *importedTplAddr)
+	}
+
+	amount := 99.0
+	{ //往模版地址转入资金
+		tShouldNil(t, Wait4balanceReach(n0.MinerAddress, 100, n0.Client))
+
+		_, err = n0.Client.Sendfrom(CmdSendfrom{
+			To:     *tplAddr,
+			From:   n0.MinerAddress,
+			Amount: amount,
+		})
+		tShouldNil(t, err)
+		tShouldNil(t, Wait4balanceReach(*tplAddr, amount, n0.Client))
+	}
+
+	outFromMultisigAddr := 23.3
+	{ //创建交易，分别签名，提交
+		rawtx, err := n0.Client.Createtransaction(CmdCreatetransaction{
+			From:   *tplAddr,
+			To:     a1.Address,
+			Amount: outFromMultisigAddr,
+		})
+		tShouldNil(t, err)
+		tShouldNotZero(t, rawtx)
+
+		sret, err := n0.Client.Signtransaction(*rawtx)
+		tShouldNil(t, err)
+		tShouldNotZero(t, sret)
+		tShouldTrue(t, !sret.Completed)
+
+		sret, err = n1.Client.Signtransaction(sret.Hex)
+		tShouldNil(t, err)
+		tShouldNotZero(t, sret)
+		tShouldTrue(t, sret.Completed)
+
+		txid, err := n1.Client.Sendtransaction(sret.Hex)
+		tShouldNil(t, err)
+		tShouldNotZero(t, txid)
+
+		tShouldNil(t, Wait4balanceReach(a1.Address, outFromMultisigAddr, n1.Client))
+
+		tx, err := n1.Client.Gettransaction(*txid, nil)
+		tShouldNil(t, err)
+		fmt.Println("tx from multisig", toJSONIndent(*tx))
+	}
+
+	tShouldNil(t, Wait4nBlocks(1, n1.Client))
+	bal, err := n1.Client.Getbalance(nil, nil)
+	tShouldNil(t, err)
+	fmt.Println("节点1余额情况：", toJSONIndent(bal))
+}
+
+// 测试2个节点的多重签名(1个持有私钥，另一个只是导入模版)
+func TestMultisig2Node(t *testing.T) {
+	// 2个节点，组成网络，其中1个挖矿
+	// 节点0导入私钥A/B
+	// 创建多签模版
+	// 2个节点确保导入模版
+	// 往模版转入资金
+	// 创建转出交易，节点签名
+	// 广播交易，等待确认
+
+	killCluster, nodes := TesttoolRunClusterWith2nodes(t)
+	defer killCluster()
+
+	// fmt.Println("miner:", nodes[0].MinerAddress)
+	n0, n1 := nodes[0], nodes[1]
+	a0, a1 := tAddr0, tAddr1
+
+	{ //导入地址
+		for _, add := range []AddrKeypair{a0, a1} {
+			_, err := n0.Client.Importprivkey(add.Privkey, _tPassphrase)
+			tShouldNil(t, err)
+			_, err = n0.Client.Unlockkey(add.Pubkey, _tPassphrase, nil)
+			tShouldNil(t, err)
+		}
+	}
+
+	var tplAddr *string
+	var err error
+	{ //创建多签模版，2个节点确保导入
+		tplAddr, err = n1.Client.Addnewtemplate(AddnewtemplateParamMultisig{
+			Required: 2,
+			Pubkeys:  []string{a0.Pubkey, a1.Pubkey},
+		})
+		tShouldNil(t, err)
+		tShouldNotZero(t, tplAddr)
+		fmt.Println("multisig tpl addr:", *tplAddr)
+
+		vret, err := n1.Client.Validateaddress(*tplAddr)
+		tShouldNil(t, err)
+		tShouldNotZero(t, vret)
+		fmt.Println("tpl addr:", toJSONIndent(*vret))
+
+		importedTplAddr, err := n0.Client.Importtemplate(vret.Addressdata.Templatedata.Hex)
+		tShouldNil(t, err)
+		tShouldTrue(t, *tplAddr == *importedTplAddr)
+	}
+
+	amount := 99.0
+	{ //往模版地址转入资金
+		tShouldNil(t, Wait4balanceReach(n0.MinerAddress, 100, n0.Client))
+
+		_, err = n0.Client.Sendfrom(CmdSendfrom{
+			To:     *tplAddr,
+			From:   n0.MinerAddress,
+			Amount: amount,
+		})
+		tShouldNil(t, err)
+		tShouldNil(t, Wait4balanceReach(*tplAddr, amount, n0.Client))
+	}
+
+	outFromMultisigAddr := 23.3
+	{ //创建交易，分别签名，提交
+		rawtx, err := n1.Client.Createtransaction(CmdCreatetransaction{
+			From:   *tplAddr,
+			To:     a1.Address,
+			Amount: outFromMultisigAddr,
+		})
+		tShouldNil(t, err)
+		tShouldNotZero(t, rawtx)
+
+		sret, err := n0.Client.Signtransaction(*rawtx)
+		tShouldNil(t, err)
+		tShouldNotZero(t, sret)
+		tShouldTrue(t, sret.Completed)
+
+		txid, err := n1.Client.Sendtransaction(sret.Hex)
+		tShouldNil(t, err)
+		tShouldNotZero(t, txid)
+
+		tShouldNil(t, Wait4balanceReach(a1.Address, outFromMultisigAddr, n0.Client))
+
+		tx, err := n1.Client.Gettransaction(*txid, nil)
+		tShouldNil(t, err)
+		fmt.Println("tx from multisig", toJSONIndent(*tx))
+	}
+
+	tShouldNil(t, Wait4nBlocks(1, n0.Client))
+	bal, err := n1.Client.Getbalance(nil, nil)
+	tShouldNil(t, err)
+	fmt.Println("节点1余额情况：", toJSONIndent(bal))
+}
+
 // 测试代币的发行/挖矿/交易/查询/遍历
 func TestToken(t *testing.T) {
-
+	t.Skip("当前不支持代币20191205,大概这个时间5个月后支持dpos")
 }
