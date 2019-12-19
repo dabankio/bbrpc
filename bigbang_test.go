@@ -7,6 +7,49 @@ import (
 	"time"
 )
 
+func TestSimpleTX(t *testing.T) {
+	killBigBangServer, client, templateAddress := TesttoolRunServerAndBeginMint(t)
+	defer killBigBangServer()
+
+	tShouldNil(t, Wait4balanceReach(templateAddress, 100, client))
+
+	a := tAddr0
+	_, err := client.Importprivkey(a.Privkey, _tPassphrase)
+	tShouldNil(t, err)
+	_, err = client.Unlockkey(a.Pubkey, _tPassphrase, nil)
+	tShouldNil(t, err)
+
+	_, err = client.Sendfrom(CmdSendfrom{
+		From:   templateAddress,
+		To:     a.Address,
+		Amount: 12.3,
+	})
+	tShouldNil(t, err)
+
+	tShouldNil(t, Wait4balanceReach(a.Address, 12, client))
+
+	ret, err := client.Createtransaction(CmdCreatetransaction{
+		From:   a.Address,
+		To:     tAddr1.Address,
+		Amount: 12.1,
+	})
+	tShouldNil(t, err)
+	tShouldNotZero(t, ret)
+	fmt.Println("created tx:", *ret)
+	fmt.Println("privk:", a.Privkey)
+
+	sret, err := client.Signtransaction(*ret)
+	tShouldNil(t, err)
+
+	deRet, err := client.Decodetransaction(sret.Hex)
+	tShouldNil(t, err)
+	tShouldNotZero(t, deRet)
+	fmt.Println("decode tx:", toJSONIndent(*deRet))
+
+	fmt.Println("sig:", deRet.Sig)
+	fmt.Println("signed hex:", sret.Hex)
+}
+
 // 测试pow挖矿,简单挖矿并列出余额
 func TestPOWMine(t *testing.T) {
 	killBigBangServer, client, templateAddress := TesttoolRunServerAndBeginMint(t)
@@ -328,7 +371,7 @@ func TestMultisigSingleNode(t *testing.T) {
 }
 
 // 测试2个节点的多重签名(分别持有私钥1个)
-func TestMultisigDoubleNode(t *testing.T) {
+func TestMultisig2Node_11(t *testing.T) {
 	// 2个节点，组成网络，其中1个挖矿
 	// 每个节点导入1个私钥A/B
 	// 创建多签模版
@@ -429,7 +472,7 @@ func TestMultisigDoubleNode(t *testing.T) {
 }
 
 // 测试2个节点的多重签名(1个持有私钥，另一个只是导入模版)
-func TestMultisig2Node(t *testing.T) {
+func TestMultisig2Node_20(t *testing.T) {
 	// 2个节点，组成网络，其中1个挖矿
 	// 节点0导入私钥A/B
 	// 创建多签模版
@@ -497,6 +540,10 @@ func TestMultisig2Node(t *testing.T) {
 		})
 		tShouldNil(t, err)
 		tShouldNotZero(t, rawtx)
+
+		deTX, err := n1.Client.Decodetransaction(*rawtx)
+		tShouldNil(t, err)
+		fmt.Println("decode created tx:", toJSONIndent(deTX))
 
 		sret, err := n0.Client.Signtransaction(*rawtx)
 		tShouldNil(t, err)

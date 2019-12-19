@@ -89,27 +89,40 @@ func TesttoolRunClusterWith2nodes(t *testing.T) (func(), []ClusterNode) {
 		}
 }
 
-//TesttoolRunServerAndBeginMint （测试中）启动bigbang,使用预置的私钥开始挖矿
+//TesttoolRunServerAndBeginMint （测试中）启动bigbang,使用预置的私钥开始挖矿, opts 作为可选参数只使用第一个值(如果有)
 // 返回：killBigbang(), Client, 挖矿模版地址
-func TesttoolRunServerAndBeginMint(t *testing.T) (func(), *Client, string) {
+func TesttoolRunServerAndBeginMint(t *testing.T, opts ...RunBigBangOptions) (func(), *Client, string) {
 	runBBOptions := DefaultDebugBBArgs()
 	runBBOptions["cryptonightaddress"] = &tCryptonightAddr.Address
 	runBBOptions["cryptonightkey"] = &tCryptonightKey.Privkey
 
-	killBigBangServer, err := RunBigBangServer(&RunBigBangOptions{
+	opt := RunBigBangOptions{
 		NewTmpDir: true,
 		Args:      runBBOptions,
-	})
+	}
+	if len(opts) > 0 {
+		opt = opts[0]
+		if len(opt.Args) == 0 {
+			opt.Args = runBBOptions
+		} else {
+			for k, v := range runBBOptions { //补充没有的参数
+				if _, ok := opt.Args[k]; !ok {
+					opt.Args[k] = v
+				}
+			}
+		}
+	}
+	killBigBangServer, err := RunBigBangServer(&opt)
 	tShouldNil(t, err, "failed to run bigbang server")
 
 	client, err := NewClient(DefaultDebugConnConfig())
 	tShouldNil(t, err, "failed to new rpc client")
 
 	{
-		_, err = client.Importprivkey(tCryptonightAddr.Privkey, _tPassphrase)
-		tShouldNil(t, err)
-		_, err = client.Importprivkey(tCryptonightKey.Privkey, _tPassphrase)
-		tShouldNil(t, err)
+		_, _ = client.Importprivkey(tCryptonightAddr.Privkey, _tPassphrase)
+		// tShouldNil(t, err)
+		_, _ = client.Importprivkey(tCryptonightKey.Privkey, _tPassphrase) //这个无需导入，配置已有，导入反而报错
+		// tShouldNil(t, err)
 
 		_, err = client.Unlockkey(tCryptonightAddr.Pubkey, _tPassphrase, nil)
 		tShouldNil(t, err)

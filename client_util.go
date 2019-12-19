@@ -1,5 +1,18 @@
 package bbrpc
 
+// Decodetransaction https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#decodetransaction
+func (c *Client) Decodetransaction(txdata string) (*NoneSerializedTransaction, error) {
+	resp, err := c.sendCmd("decodetransaction", struct {
+		Txdata string `json:"txdata"`
+	}{Txdata: txdata})
+	if err != nil {
+		return nil, err
+	}
+	var ret NoneSerializedTransaction
+	err = futureParse(resp, &ret)
+	return &ret, err
+}
+
 // Getpubkeyaddress https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#getpubkeyaddress
 func (c *Client) Getpubkeyaddress(pubkey string, reversal *string) (*string, error) {
 	resp, err := c.sendCmd("getpubkeyaddress", struct {
