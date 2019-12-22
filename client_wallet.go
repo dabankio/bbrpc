@@ -124,6 +124,19 @@ func (c *Client) Importtemplate(data string) (*string, error) {
 	return &address, err
 }
 
+// Importpubkey https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#importpubkey
+func (c *Client) Importpubkey(pubkey string) (*string, error) {
+	resp, err := c.sendCmd("importpubkey", struct {
+		Pubkey string `json:"pubkey"`
+	}{pubkey})
+	if err != nil {
+		return nil, err
+	}
+	var address string
+	err = futureParse(resp, &address)
+	return &address, err
+}
+
 // Listaddress https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#listaddress
 func (c *Client) Listaddress() ([]AddressData, error) {
 	resp, err := c.sendCmd("listaddress", nil)

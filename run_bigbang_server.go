@@ -8,6 +8,13 @@ import (
 	"time"
 )
 
+// 一些测试用常量
+const (
+	TDefaultRPCPort     = 9906
+	TDefaultRPCUser     = "rpcusr"
+	TDefaultRPCPassword = "pwd"
+)
+
 // DefaultDebugBBArgs debug BigBang args
 // testnet,listen4,debug,port=9900,rpcport=9906,rpcuser=rpcusr,rpcpassword=pwd
 func DefaultDebugBBArgs() map[string]*string {

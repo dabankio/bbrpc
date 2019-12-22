@@ -1,7 +1,7 @@
 package bbrpc
 
 import (
-	"log"
+	"fmt"
 	"reflect"
 	"runtime/debug"
 	"strings"
@@ -157,6 +157,8 @@ func Wait4nBlocks(n int64, client *Client) error {
 		return err
 	}
 
+	fmt.Printf("等待 %d 个块 ", n)
+	prevDiff := int64(0)
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 	for {
@@ -167,27 +169,43 @@ func Wait4nBlocks(n int64, client *Client) error {
 		}
 		diff := *currentCount - *count
 		if diff >= n {
-			log.Printf("出块已达到 %d (%d)\n", n, diff)
+			fmt.Printf("[达到(%d)]\n", diff)
 			return nil
 		}
-		log.Printf("休眠1s，等待 %d 个块,当前 %d\n", n, diff)
+		fmt.Print(".")
+		if prevDiff != diff {
+			fmt.Print(diff)
+			prevDiff = diff
+		}
 	}
 }
 
 // Wait4balanceReach 每次休眠1s，等待地址的余额达到
 func Wait4balanceReach(addr string, balance float64, client *Client) error {
+	fmt.Printf("等待地址 %s 余额达到%v ", addr, balance)
+
+	prevBal := 0.0
 	for {
 		bal, err := client.Getbalance(nil, &addr)
 		if err != nil {
 			return err
 		}
 
-		if len(bal) > 0 && bal[0].Avail >= balance {
-			log.Printf("地址 %s 余额达到%v (%v)\n", addr, balance, bal[0].Avail)
-			return nil
+		f := 0.0
+		if len(bal) > 0 {
+			f = bal[0].Avail
 		}
 
-		log.Printf("休眠1s，等待地址 %s 余额达到%v (当前 %v)\n", addr, balance, bal)
+		fmt.Printf(".")
+		if f != prevBal {
+			prevBal = f
+			fmt.Printf("%v", f)
+		}
+
+		if f >= balance {
+			fmt.Printf("[达到]\n")
+			return nil
+		}
 		time.Sleep(time.Second)
 	}
 }
