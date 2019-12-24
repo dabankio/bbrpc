@@ -1,14 +1,14 @@
 package bbrpc
 
 // Getblockcount https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#getblockcount
-func (c *Client) Getblockcount(fork *string) (*int64, error) {
+func (c *Client) Getblockcount(fork *string) (*int, error) {
 	resp, err := c.sendCmd("getblockcount", struct {
 		Fork *string `json:"fork,omitempty"`
 	}{Fork: fork})
 	if err != nil {
 		return nil, err
 	}
-	var height int64
+	var height int
 	err = futureParse(resp, &height)
 	return &height, err
 }
@@ -54,7 +54,7 @@ func (c *Client) Getblockhash(height int, fork *string) ([]string, error) {
 }
 
 // Getforkheight https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#getforkheight
-func (c *Client) Getforkheight(fork *string) (h int64, err error) {
+func (c *Client) Getforkheight(fork *string) (h int, err error) {
 	resp, err := c.sendCmd("getforkheight", struct {
 		Fork *string `json:"fork,omitempty"`
 	}{Fork: fork})

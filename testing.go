@@ -161,14 +161,14 @@ func runClientTest(t *testing.T, testFn func(*Client, string)) {
 }
 
 // Wait4nBlocks 每次休眠1s，直到出了n个块
-func Wait4nBlocks(n int64, client *Client) error {
+func Wait4nBlocks(n int, client *Client) error {
 	count, err := client.Getblockcount(nil)
 	if err != nil {
 		return err
 	}
 
 	fmt.Printf("等待 %d 个块 ", n)
-	prevDiff := int64(0)
+	prevDiff := 0
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 	for {

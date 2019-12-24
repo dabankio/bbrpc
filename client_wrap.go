@@ -83,7 +83,7 @@ func (c *Client) ListTransactionsSinceBlock(targetBlockHash string, count int) (
 
 // ListBlockDetailsSince 列出自某个区块以来的所有区块详情，不包含targetBlock的交易
 // return: topBlockHeight, blockDetails, error
-func (c *Client) ListBlockDetailsSince(targetBlockHash string, count int) (int64, []BlockDetail, error) {
+func (c *Client) ListBlockDetailsSince(targetBlockHash string, count int) (int, []BlockDetail, error) {
 	var fork *string = nil
 	const defaultRecentHeight = 30 //如果提供的hash为空，则取最近的n个块的交易
 

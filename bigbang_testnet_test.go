@@ -18,7 +18,7 @@ func TestTestnetBockPeriod(t *testing.T) {
 	defer client.Shutdown()
 
 	var (
-		maxHeight int64
+		maxHeight int
 	)
 	{
 		maxHeight, err = client.Getforkheight(nil)
@@ -64,7 +64,7 @@ func TestViewTestnet(t *testing.T) {
 	defer client.Shutdown()
 
 	var (
-		maxHeight int64
+		maxHeight int
 	)
 	{
 		maxHeight, err = client.Getforkheight(nil)

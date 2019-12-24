@@ -148,7 +148,7 @@ func TestRunMineNode(t *testing.T) {
 	tickerDone := make(chan bool)
 
 	type gotBlock struct {
-		Count int64
+		Count int
 		Time  time.Time
 	}
 	gotBlocks := make([]gotBlock, 0)
