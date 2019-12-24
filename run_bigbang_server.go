@@ -10,20 +10,23 @@ import (
 
 // 一些测试用常量
 const (
-	TDefaultRPCPort     = 9906
+	TDefaultPort        = 19900
+	TDefaultRPCPort     = 19906
+	TDefaultPort2       = 19901
+	TDefaultRPCPort2    = 19907
 	TDefaultRPCUser     = "rpcusr"
 	TDefaultRPCPassword = "pwd"
 )
 
 // DefaultDebugBBArgs debug BigBang args
-// testnet,listen4,debug,port=9900,rpcport=9906,rpcuser=rpcusr,rpcpassword=pwd
+// testnet,listen4,debug,port=19900,rpcport=19906,rpcuser=rpcusr,rpcpassword=pwd
 func DefaultDebugBBArgs() map[string]*string {
 	return map[string]*string{
 		"testnet":     nil,
 		"listen4":     nil,
 		"debug":       nil,
-		"port":        ps("9900"),
-		"rpcport":     ps("9906"),
+		"port":        ps("19900"),
+		"rpcport":     ps("19906"),
 		"rpcuser":     ps("rpcusr"),
 		"rpcpassword": ps("pwd"),
 	}
@@ -32,7 +35,7 @@ func DefaultDebugBBArgs() map[string]*string {
 // DefaultDebugConnConfig .
 func DefaultDebugConnConfig() *ConnConfig {
 	return &ConnConfig{
-		Host:       "127.0.0.1:9906",
+		Host:       "127.0.0.1:19906",
 		DisableTLS: true,
 		User:       "rpcusr",
 		Pass:       "pwd",

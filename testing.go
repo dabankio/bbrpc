@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"runtime/debug"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -49,9 +50,10 @@ func TesttoolRunClusterWith2nodes(t *testing.T) (func(), []ClusterNode) {
 	killMiner, minerClient, minerAddress := TesttoolRunServerAndBeginMint(t)
 
 	runBBOptions := DefaultDebugBBArgs()
-	runBBOptions["port"] = Pstring("9901")
-	runBBOptions["rpcport"] = Pstring("9907")
-	ipHost := "127.0.0.1:9900"
+
+	runBBOptions["port"] = Pstring(strconv.Itoa(TDefaultPort2))
+	runBBOptions["rpcport"] = Pstring(strconv.Itoa(TDefaultRPCPort2))
+	ipHost := "127.0.0.1:" + strconv.Itoa(TDefaultPort)
 	runBBOptions["addnode"] = &ipHost
 
 	killPeer, err := RunBigBangServer(&RunBigBangOptions{
@@ -62,7 +64,7 @@ func TesttoolRunClusterWith2nodes(t *testing.T) (func(), []ClusterNode) {
 	})
 	tShouldNil(t, err)
 	conn := DefaultDebugConnConfig()
-	conn.Host = "127.0.0.1:9907"
+	conn.Host = "127.0.0.1:" + strconv.Itoa(TDefaultRPCPort2)
 	peerClient, err := NewClient(conn)
 	tShouldNil(t, err, "failed to new rpc client")
 
