@@ -112,6 +112,9 @@ func TesttoolRunServerAndBeginMint(t *testing.T, opts ...RunBigBangOptions) (fun
 			}
 		}
 	}
+	if !testing.Verbose() {
+		opt.NotPrint2stdout = true
+	}
 	killBigBangServer, err := RunBigBangServer(&opt)
 	tShouldNil(t, err, "failed to run bigbang server")
 
@@ -148,6 +151,13 @@ func testClientMethod(t *testing.T, testFn func(*Client)) {
 	killBigBangServer, client, _ := TesttoolRunServerAndBeginMint(t)
 	defer killBigBangServer()
 	testFn(client)
+}
+
+// 启动bigbang-server,创建一个client,调用testFn(client)
+func runClientTest(t *testing.T, testFn func(*Client, string)) {
+	killBigBangServer, client, minerAddr := TesttoolRunServerAndBeginMint(t)
+	defer killBigBangServer()
+	testFn(client, minerAddr)
 }
 
 // Wait4nBlocks 每次休眠1s，直到出了n个块
@@ -193,7 +203,7 @@ func Wait4balanceReach(addr string, balance float64, client *Client) error {
 
 		f := 0.0
 		if len(bal) > 0 {
-			f = bal[0].Avail
+			f = bal[0].Avail - bal[0].Unconfirmed
 		}
 
 		fmt.Printf(".")

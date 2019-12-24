@@ -80,3 +80,62 @@ func (c *Client) ListTransactionsSinceBlock(targetBlockHash string, count int) (
 	}
 	return prevBlockHash, all, nil
 }
+
+// ListBlockDetailsSince 列出自某个区块以来的所有区块详情，不包含targetBlock的交易
+// return: topBlockHeight, blockDetails, error
+func (c *Client) ListBlockDetailsSince(targetBlockHash string, count int) (int64, []BlockDetail, error) {
+	var fork *string = nil
+	const defaultRecentHeight = 30 //如果提供的hash为空，则取最近的n个块的交易
+
+	topForkHeight, err := c.Getforkheight(fork)
+	if err != nil {
+		return -1, nil, fmt.Errorf("failed to get fork height, %v", err)
+	}
+
+	if targetBlockHash == "" { //默认取最近30个块吧
+		defaultTargetBlockHeight := topForkHeight - defaultRecentHeight
+		if defaultTargetBlockHeight < 1 {
+			defaultTargetBlockHeight = 1
+		}
+		defaultTargetBlockHash, err := c.Getblockhash(int(defaultTargetBlockHeight), nil)
+		if err != nil || len(defaultTargetBlockHash) == 0 {
+			return topForkHeight, nil, fmt.Errorf("failed to get default target block hash, %v, len(hash): %d", err, len(defaultTargetBlockHash))
+		}
+		targetBlockHash = defaultTargetBlockHash[0]
+	}
+
+	var all []BlockDetail
+
+	var prevBlockHeight uint
+	{
+		block, err := c.Getblock(targetBlockHash)
+		if err != nil {
+			return topForkHeight, nil, fmt.Errorf("failed to get block [%s]", targetBlockHash)
+		}
+		if block.Height == uint(topForkHeight) { //已经是最新高度了
+			return topForkHeight, nil, nil
+		}
+		prevBlockHeight = block.Height
+	}
+
+	scannedBlockCount := 0
+	for {
+		prevBlockHeight++
+		blockHash, err := c.Getblockhash(int(prevBlockHeight), fork)
+		if err != nil || len(blockHash) == 0 {
+			return topForkHeight, nil, fmt.Errorf("failed to get block hash @ [%d], result len: [%d], %v", prevBlockHeight, len(blockHash), err)
+		}
+
+		detail, err := c.Getblockdetail(blockHash[0])
+		if err != nil {
+			return topForkHeight, nil, fmt.Errorf("failed to get block detail @ [%s], %v", blockHash, err)
+		}
+		all = append(all, *detail)
+
+		scannedBlockCount++
+		if detail.Height == uint(topForkHeight) || scannedBlockCount >= count {
+			break
+		}
+	}
+	return topForkHeight, all, nil
+}

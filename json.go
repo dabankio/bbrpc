@@ -165,6 +165,21 @@ type BlockInfo struct {
 	Tx      []string `json:"tx"`      //(string, required) transaction hash
 }
 
+// BlockDetail 区块详细信息
+type BlockDetail struct {
+	Hash     string                      `json:"hash,omitempty"`     //(string, required) block hash
+	HashPrev string                      `json:"hashPrev,omitempty"` //(string, required) block prev hash
+	Version  uint                        `json:"version,omitempty"`  //(uint, required) version
+	Type     string                      `json:"type,omitempty"`     //(string, required) block type
+	Time     uint                        `json:"time,omitempty"`     //(uint, required) block time
+	Bits     uint                        `json:"bits,omitempty"`     //(uint, required) nBits
+	Fork     string                      `json:"fork,omitempty"`     //(string, required) fork hash
+	Height   uint                        `json:"height,omitempty"`   //(uint, required) block height
+	Prev     string                      `json:"prev,omitempty"`     //(string, optional) previous block hash
+	Txmint   NoneSerializedTransaction   `json:"txmint,omitempty"`   // (object, required) transaction mint data
+	Tx       []NoneSerializedTransaction `json:"tx,omitempty"`
+}
+
 // CmdCreatetransaction .
 type CmdCreatetransaction struct {
 	From   string   `json:"from,omitempty"`   //(string, required) from address
@@ -212,6 +227,7 @@ type NoneSerializedTransaction struct {
 	Time          uint       `json:"time,omitempty"`          //(uint, required) transaction timestamp
 	Lockuntil     uint       `json:"lockuntil,omitempty"`     //(uint, required) unlock time
 	Anchor        string     `json:"anchor,omitempty"`        //(string, required) anchor hash
+	Sendfrom      string     `json:"sendfrom,omitempty"`      //(string, required) send from address
 	Sendto        string     `json:"sendto,omitempty"`        //(string, required) send to address
 	Amount        float64    `json:"amount,omitempty"`        //(double, required) amount
 	Txfee         float64    `json:"txfee,omitempty"`         //(double, required) transaction fee

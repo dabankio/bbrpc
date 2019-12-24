@@ -26,6 +26,19 @@ func (c *Client) Getblock(hash string) (*BlockInfo, error) {
 	return &info, err
 }
 
+// Getblockdetail https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#getblockdetail
+func (c *Client) Getblockdetail(blockHash string) (*BlockDetail, error) {
+	resp, err := c.sendCmd("getblockdetail", struct {
+		Block string `json:"block"`
+	}{blockHash})
+	if err != nil {
+		return nil, err
+	}
+	var info BlockDetail
+	err = futureParse(resp, &info)
+	return &info, err
+}
+
 // Getblockhash https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#getblockhash
 func (c *Client) Getblockhash(height int, fork *string) ([]string, error) {
 	resp, err := c.sendCmd("getblockhash", struct {
