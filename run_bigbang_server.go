@@ -44,11 +44,11 @@ func DefaultDebugConnConfig() *ConnConfig {
 
 // RunBigBangOptions .
 type RunBigBangOptions struct {
-	NewTmpDir          bool               //创建并使用新的临时目录作为datadir
-	TmpDirTag          string             //tag会作为临时路径的前缀
-	RemoveTmpDirInKill bool               //kill func中移除临时目录
-	Args               map[string]*string //k-v ,v 为nil时为flag
-	NotPrint2stdout    bool               //不打印到stdout
+	NewTmpDir        bool               //创建并使用新的临时目录作为datadir
+	TmpDirTag        string             //tag会作为临时路径的前缀
+	KeepTmpDirInKill bool               //kill func中保留临时目录
+	Args             map[string]*string //k-v ,v 为nil时为flag
+	NotPrint2stdout  bool               //不打印到stdout
 }
 type killHook func() error
 
@@ -91,7 +91,7 @@ func RunBigBangServer(optionsPtr *RunBigBangOptions) (func(), error) {
 		}
 		options.Args["datadir"] = &dataDir
 
-		if options.RemoveTmpDirInKill {
+		if !options.KeepTmpDirInKill {
 			killHooks = append(killHooks, func() error {
 				return os.RemoveAll(dataDir)
 			})

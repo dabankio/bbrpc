@@ -73,3 +73,22 @@ func TestClient_Importkey(t *testing.T) {
 		fmt.Println("unlock ret:", *ret)
 	})
 }
+
+func TestClient_Addnewtemplate(t *testing.T) {
+	tw := TW{T: t}
+	tw.Continue(true)
+	runClientTest(t, func(c *Client, minerAddr string) {
+		pubks := make([]string, 2)
+		for i := 0; i < len(pubks); i++ {
+			p, err := c.Makekeypair()
+			tw.Nil(err)
+			pubks[i] = p.Pubkey
+		}
+
+		tplAddr, err := c.Addnewtemplate(AddnewtemplateParamMultisig{
+			Required: 2, Pubkeys: pubks,
+		})
+		tw.Nil(err)
+		fmt.Println(tplAddr)
+	})
+}
