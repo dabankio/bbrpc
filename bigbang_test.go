@@ -13,7 +13,7 @@ func TestSimpleTX(t *testing.T) {
 
 	tShouldNil(t, Wait4balanceReach(templateAddress, 100, client))
 
-	a := tAddr0
+	a := TAddr0
 	_, err := client.Importprivkey(a.Privkey, _tPassphrase)
 	tShouldNil(t, err)
 	_, err = client.Unlockkey(a.Pubkey, _tPassphrase, nil)
@@ -30,7 +30,7 @@ func TestSimpleTX(t *testing.T) {
 
 	ret, err := client.Createtransaction(CmdCreatetransaction{
 		From:   a.Address,
-		To:     tAddr1.Address,
+		To:     TAddr1.Address,
 		Amount: 12.1,
 	})
 	tShouldNil(t, err)
@@ -66,21 +66,21 @@ func TestPOWMine(t *testing.T) {
 	tShouldNil(t, err)
 
 	fmt.Println("balance:", toJSONIndent(balance))
-	fmt.Println("addr:", toJSONIndent(tCryptonightAddr))
-	fmt.Println("key:", toJSONIndent(tCryptonightKey))
+	fmt.Println("addr:", toJSONIndent(TCryptonightAddr))
+	fmt.Println("key:", toJSONIndent(TCryptonightKey))
 
 	{ //尝试把挖到的币花费掉
-		// result, err := client.Unlockkey(tCryptonightKey.Pubkey, _tPassphrase, nil)
+		// result, err := client.Unlockkey(TCryptonightKey.Pubkey, _tPassphrase, nil)
 		// tShouldNil(t, err)
 		// tShouldTrue(t, strings.Contains(*result, "success"))
 
-		// result, err = client.Unlockkey(tCryptonightAddr.Pubkey, _tPassphrase, nil)
+		// result, err = client.Unlockkey(TCryptonightAddr.Pubkey, _tPassphrase, nil)
 		// tShouldNil(t, err)
 		// tShouldTrue(t, strings.Contains(*result, "success"))
 
 		txid, err := client.Sendfrom(CmdSendfrom{
 			From:   templateAddress,
-			To:     tCryptonightAddr.Address,
+			To:     TCryptonightAddr.Address,
 			Amount: 50,
 		})
 		tShouldNil(t, err)
@@ -226,7 +226,7 @@ func TestMultiVinTx(t *testing.T) {
 
 	Wait4nBlocks(1, client)
 
-	for _, k := range []AddrKeypair{tAddr0, tAddr1} {
+	for _, k := range []AddrKeypair{TAddr0, TAddr1} {
 		ret, err := client.Importprivkey(k.Privkey, _tPassphrase)
 		tShouldNil(t, err)
 		tShouldTrue(t, ret != nil)
@@ -242,7 +242,7 @@ func TestMultiVinTx(t *testing.T) {
 
 	for i := 0; i < 3; i++ {
 		txid, err := client.Sendfrom(CmdSendfrom{
-			From: mintTplAddress, To: tAddr0.Address, Amount: 15,
+			From: mintTplAddress, To: TAddr0.Address, Amount: 15,
 		})
 		tShouldNil(t, err)
 		tShouldTrue(t, txid != nil)
@@ -252,7 +252,7 @@ func TestMultiVinTx(t *testing.T) {
 
 	{ // 0 transfer to 1
 		txid, err := client.Sendfrom(CmdSendfrom{
-			From: tAddr0.Address, To: tAddr1.Address, Amount: 32,
+			From: TAddr0.Address, To: TAddr1.Address, Amount: 32,
 		})
 		tShouldNil(t, err)
 		tShouldTrue(t, txid != nil)
@@ -272,7 +272,7 @@ func TestMultiVinTx(t *testing.T) {
 
 	//余额不足的情况
 	_, err = client.Sendfrom(CmdSendfrom{
-		From: tAddr0.Address, To: tAddr1.Address, Amount: 1000,
+		From: TAddr0.Address, To: TAddr1.Address, Amount: 1000,
 	})
 	tShouldTrue(t, err != nil)
 	fmt.Println("insufficient error", err)
@@ -325,7 +325,7 @@ func TestMultisigSingleNode(t *testing.T) {
 	// 使用2个地址，产生一个多签地址
 	// 将资金转入多签地址
 	// 从多签地址将资金转出
-	a0, a1, a2 := tAddr0, tAddr1, tAddr2
+	a0, a1, a2 := TAddr0, TAddr1, TAddr2
 	for _, a := range []AddrKeypair{a0, a1, a2} {
 		_, err := client.Importprivkey(a.Privkey, _tPassphrase)
 		tShouldNil(t, err)
@@ -386,7 +386,7 @@ func TestMultisig2Node_11(t *testing.T) {
 
 	// fmt.Println("miner:", nodes[0].MinerAddress)
 	n0, n1 := nodes[0], nodes[1]
-	a0, a1 := tAddr0, tAddr1
+	a0, a1 := TAddr0, TAddr1
 
 	{ //2个节点分别导入地址
 		for _, imp := range []struct {
@@ -487,7 +487,7 @@ func TestMultisig2Node_20(t *testing.T) {
 
 	// fmt.Println("miner:", nodes[0].MinerAddress)
 	n0, n1 := nodes[0], nodes[1]
-	a0, a1 := tAddr0, tAddr1
+	a0, a1 := TAddr0, TAddr1
 
 	{ //导入地址
 		for _, add := range []AddrKeypair{a0, a1} {

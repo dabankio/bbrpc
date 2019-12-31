@@ -43,6 +43,7 @@ type ClusterNode struct {
 	IsMiner      bool
 	MinerAddress string
 	Client       *Client
+	RPCPort      int
 }
 
 //TesttoolRunClusterWith2nodes 运行2个节点，返回的第一个节点为矿工节点,发生错误则终止测试,矿工节点的日志会打印出来
@@ -86,8 +87,8 @@ func TesttoolRunClusterWith2nodes(t *testing.T) (func(), []ClusterNode) {
 			peerClient.Shutdown()
 		},
 		[]ClusterNode{
-			{IsMiner: true, MinerAddress: minerAddress, Client: minerClient},
-			{Client: peerClient},
+			{IsMiner: true, MinerAddress: minerAddress, Client: minerClient, RPCPort: TDefaultRPCPort},
+			{Client: peerClient, RPCPort: TDefaultRPCPort2},
 		}
 }
 
@@ -95,8 +96,8 @@ func TesttoolRunClusterWith2nodes(t *testing.T) (func(), []ClusterNode) {
 // 返回：killBigbang(), Client, 挖矿模版地址
 func TesttoolRunServerAndBeginMint(t *testing.T, opts ...RunBigBangOptions) (func(), *Client, string) {
 	runBBOptions := DefaultDebugBBArgs()
-	runBBOptions["cryptonightaddress"] = &tCryptonightAddr.Address
-	runBBOptions["cryptonightkey"] = &tCryptonightKey.Privkey
+	runBBOptions["cryptonightaddress"] = &TCryptonightAddr.Address
+	runBBOptions["cryptonightkey"] = &TCryptonightKey.Privkey
 
 	opt := RunBigBangOptions{
 		NewTmpDir: true,
@@ -124,21 +125,16 @@ func TesttoolRunServerAndBeginMint(t *testing.T, opts ...RunBigBangOptions) (fun
 	tShouldNil(t, err, "failed to new rpc client")
 
 	{
-		_, _ = client.Importprivkey(tCryptonightAddr.Privkey, _tPassphrase)
-		// tShouldNil(t, err)
-		_, _ = client.Importprivkey(tCryptonightKey.Privkey, _tPassphrase) //这个无需导入，配置已有，导入反而报错
-		// tShouldNil(t, err)
-
-		_, err = client.Unlockkey(tCryptonightAddr.Pubkey, _tPassphrase, nil)
-		tShouldNil(t, err)
-		_, err = client.Unlockkey(tCryptonightKey.Pubkey, _tPassphrase, nil)
-		tShouldNil(t, err)
+		_, _ = client.Importprivkey(TCryptonightAddr.Privkey, _tPassphrase)
+		_, _ = client.Importprivkey(TCryptonightKey.Privkey, _tPassphrase) //这个无需导入，配置已有，导入反而报错
+		_, _ = client.Unlockkey(TCryptonightAddr.Pubkey, _tPassphrase, nil)
+		_, _ = client.Unlockkey(TCryptonightKey.Pubkey, _tPassphrase, nil)
 	}
 
 	//开始挖矿
 	templateAddress, err := client.Addnewtemplate(AddnewtemplateParamMint{
-		Mint:  tCryptonightKey.Pubkey,
-		Spent: tCryptonightAddr.Address,
+		Mint:  TCryptonightKey.Pubkey,
+		Spent: TCryptonightAddr.Address,
 	})
 	tShouldNil(t, err)
 
