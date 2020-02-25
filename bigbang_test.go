@@ -7,7 +7,53 @@ import (
 	"time"
 )
 
-func TestSimpleTX(t *testing.T) {
+func TestSimpleSendfromWithData(t *testing.T) {
+	killBigBangServer, client, templateAddress := TesttoolRunServerAndBeginMint(t)
+	defer killBigBangServer()
+
+	tShouldNil(t, Wait4balanceReach(templateAddress, 100, client))
+
+	a := TAddr0
+	_, err := client.Importprivkey(a.Privkey, _tPassphrase)
+	tShouldNil(t, err)
+	_, err = client.Unlockkey(a.Pubkey, _tPassphrase, nil)
+	tShouldNil(t, err)
+
+	_, err = client.Sendfrom(CmdSendfrom{
+		From:   templateAddress,
+		To:     a.Address,
+		Amount: 12.3,
+		Data:   pstring("0xfab1"),
+	})
+	tShouldNil(t, err)
+
+	tShouldNil(t, Wait4balanceReach(a.Address, 12, client))
+
+	toAddr := TAddr1
+	txid, err := client.Sendfrom(CmdSendfrom{
+		From:   a.Address,
+		To:     toAddr.Address,
+		Amount: 12.1,
+		Data:   pstring(UtilDataEncoding("卢本伟🐂🍺")),
+	})
+	tShouldNil(t, err)
+	tShouldNil(t, Wait4nBlocks(1, client))
+
+	// tx, err := client.Gettransaction(*txid, pbool(true))
+	tx, err := client.Gettransaction(*txid, nil)
+	tShouldNil(t, err)
+	fmt.Println("tx::", toJSONIndent(tx))
+	fmt.Println(UtilDataDecoding(tx.Transaction.Data))
+
+	if tx.Serialization != nil {
+		detx, err := client.Decodetransaction(*tx.Serialization)
+		tShouldNil(t, err)
+		fmt.Println("tx::", toJSONIndent(detx))
+	}
+	time.Sleep(2 * time.Second)
+
+}
+func TestSimpleSignTX(t *testing.T) {
 	killBigBangServer, client, templateAddress := TesttoolRunServerAndBeginMint(t)
 	defer killBigBangServer()
 
@@ -32,6 +78,7 @@ func TestSimpleTX(t *testing.T) {
 		From:   a.Address,
 		To:     TAddr1.Address,
 		Amount: 12.1,
+		Data:   pstring(UtilDataEncoding("abc123")),
 	})
 	tShouldNil(t, err)
 	tShouldNotZero(t, ret)
@@ -41,6 +88,14 @@ func TestSimpleTX(t *testing.T) {
 	sret, err := client.Signtransaction(*ret)
 	tShouldNil(t, err)
 	tShouldNotZero(t, sret)
+
+	txid, err := client.Sendtransaction(sret.Hex)
+	tShouldNil(t, err)
+	tShouldNil(t, Wait4nBlocks(1, client))
+
+	tx, err := client.Gettransaction(*txid, nil)
+	tShouldNil(t, err)
+	fmt.Println("tx::", toJSONIndent(tx))
 
 	// DecodeTx 这个，有问题（钱包那边），暂时就先不测试了
 	// deRet, err := client.Decodetransaction(sret.Hex)
@@ -341,6 +396,7 @@ func TestMultisigSingleNode(t *testing.T) {
 	tShouldNil(t, err)
 	tShouldNotZero(t, tplAddr)
 	fmt.Println("multisig tpl addr:", *tplAddr)
+	tShouldNil(t, Wait4nBlocks(3, client))
 
 	vret, err := client.Validateaddress(*tplAddr)
 	tShouldNil(t, err)
