@@ -25,7 +25,7 @@ func Pstring(s string) *string { return &s }
 // UtilDataEncoding 将tx data 进行编码
 func UtilDataEncoding(data string) string {
 	b := make([]byte, 4)
-	binary.BigEndian.PutUint32(b, uint32(time.Now().Unix()))
+	binary.LittleEndian.PutUint32(b, uint32(time.Now().Unix()))
 
 	return strings.Join([]string{
 		strings.Replace(uuid.New().String(), "-", "", -1),
@@ -47,7 +47,7 @@ func UtilDataDecoding(data string) (DataDetail, error) {
 	if err != nil {
 		return dd, fmt.Errorf("unable to decode time, %v", err)
 	}
-	dd.UnixTime = binary.BigEndian.Uint32(timeBytes)
+	dd.UnixTime = binary.LittleEndian.Uint32(timeBytes)
 
 	content, err := hex.DecodeString(data[42:])
 	if err != nil {

@@ -1,9 +1,12 @@
 package bbrpc
 
 import (
+	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestUtilDataEncoding(t *testing.T) {
@@ -22,4 +25,23 @@ func TestUtilDataEncoding(t *testing.T) {
 		tShouldNil(t, er)
 		tShouldTrue(t, tt == de.Data, fmt.Sprintf("expected: %s, got: %s\n", tt, de.Data))
 	}
+}
+
+func TestDataTime(t *testing.T) {
+	data := "🇮🇹加油；🇫🇷加油；🇮🇷加油；"
+	encData := UtilDataEncoding(data)
+	fmt.Println(encData)
+}
+
+func TestTimeHex(t *testing.T) {
+	b := make([]byte, 4)
+	// binary.LittleEndian.PutUint32(b, uint32(time.Now().Unix()))
+	binary.LittleEndian.PutUint32(b, 1585562244)
+	fmt.Println("LittleEndian", hex.EncodeToString(b))
+
+	binary.BigEndian.PutUint32(b, 1585562244)
+	fmt.Println("BigEndian", hex.EncodeToString(b))
+
+	_ = time.Second
+	// fmt.Println(time.Now().Unix())
 }

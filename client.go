@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -124,11 +125,14 @@ func (c *Client) NextID() uint64 {
 // depending on several factors including the remote server configuration.
 func (c *Client) sendPost(jReq *jsonRequest) {
 	// Generate a request to the configured RPC server.
-	protocol := "http"
-	if !c.config.DisableTLS {
-		protocol = "https"
+	url := c.config.Host
+	if !strings.HasPrefix(c.config.Host, "http") {
+		protocol := "http"
+		if !c.config.DisableTLS {
+			protocol = "https"
+		}
+		url = protocol + "://" + c.config.Host
 	}
-	url := protocol + "://" + c.config.Host
 	bodyReader := bytes.NewReader(jReq.marshalledJSON)
 	httpReq, err := http.NewRequest(http.MethodPost, url, bodyReader)
 	if err != nil {
