@@ -126,6 +126,30 @@ func (p AddnewtemplateParamMint) TemplateType() string { return "mint" }
 // ParamName .
 func (p AddnewtemplateParamMint) ParamName() string { return "mint" }
 
+// AddnewtemplateParamDelegate .
+type AddnewtemplateParamDelegate struct {
+	Delegate string `json:"delegate,omitempty"` //(string, required) delegate public key
+	Owner    string `json:"owner,omitempty"`    //(string, required) owner address
+}
+
+// TemplateType .
+func (p AddnewtemplateParamDelegate) TemplateType() string { return "delegate" }
+
+// ParamName .
+func (p AddnewtemplateParamDelegate) ParamName() string { return "delegate" }
+
+// AddnewtemplateParamVote .
+type AddnewtemplateParamVote struct {
+	Delegate string `json:"delegate,omitempty"` //(string, required) delegate public key
+	Owner    string `json:"owner,omitempty"`    //(string, required) owner address
+}
+
+// TemplateType .
+func (p AddnewtemplateParamVote) TemplateType() string { return "vote" }
+
+// ParamName .
+func (p AddnewtemplateParamVote) ParamName() string { return "vote" }
+
 // AddnewtemplateParamMultisig .
 type AddnewtemplateParamMultisig struct {
 	Required int      `json:"required,omitempty"`

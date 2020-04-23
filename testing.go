@@ -189,8 +189,8 @@ func Wait4nBlocks(n int, client *Client) error {
 }
 
 // Wait4balanceReach 每次休眠1s，等待地址的余额达到
-func Wait4balanceReach(addr string, balance float64, client *Client) error {
-	fmt.Printf("等待地址 %s 余额达到%v ", addr, balance)
+func Wait4balanceReach(addr string, balance float64, client *Client, msg ...string) error {
+	fmt.Printf("%v等待地址 %s 余额达到%v ", msg, addr, balance)
 
 	prevBal := 0.0
 	for {
