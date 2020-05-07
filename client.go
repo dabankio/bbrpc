@@ -94,6 +94,8 @@ type ConnConfig struct {
 
 // Client .
 type Client struct {
+	Debug bool //print some debug log when true
+	
 	id uint64 // atomic, so must stay 64-bit aligned
 	// config holds the connection configuration associated with this client.
 	config     *ConnConfig
@@ -222,7 +224,9 @@ cleanup:
 		}
 	}
 	c.wg.Done()
-	log.Printf("RPC client send handler done for %s", c.config.Host)
+	if c.Debug {
+		log.Printf("RPC client send handler done for %s", c.config.Host)
+	}
 }
 
 // handleSendPostMessage handles performing the passed HTTP request, reading the
@@ -327,7 +331,9 @@ func (c *Client) doShutdown() bool {
 	default:
 	}
 
-	log.Printf("Shutting down RPC client %s", c.config.Host)
+	if c.Debug {
+		log.Printf("Shutting down RPC client %s", c.config.Host)
+	}
 	close(c.shutdown)
 	c.httpClient.CloseIdleConnections()
 	return true
