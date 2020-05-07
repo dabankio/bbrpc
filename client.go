@@ -329,6 +329,7 @@ func (c *Client) doShutdown() bool {
 
 	log.Printf("Shutting down RPC client %s", c.config.Host)
 	close(c.shutdown)
+	c.httpClient.CloseIdleConnections()
 	return true
 }
 
