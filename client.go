@@ -284,6 +284,20 @@ func NewClient(config *ConnConfig) (*Client, error) {
 	return client, nil
 }
 
+// NewClientWith .
+func NewClientWith(config *ConnConfig, httpClient *http.Client) (*Client, error) {
+	client := &Client{
+		config:       config,
+		httpClient:   httpClient,
+		sendPostChan: make(chan *sendPostDetails, sendPostBufferSize),
+		shutdown:     make(chan struct{}),
+	}
+
+	client.wg.Add(1)
+	go client.sendPostHandler()
+	return client, nil
+}
+
 // Shutdown shuts down the client by disconnecting any connections associated
 // with the client and, when automatic reconnect is enabled, preventing future
 // attempts to reconnect.  It also stops all goroutines.
