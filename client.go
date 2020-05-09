@@ -349,6 +349,9 @@ func futureParse(f chan *response, v interface{}) error {
 	if r.err != nil {
 		return fmt.Errorf("RPC request return error: %v", r.err)
 	}
+	if Debug {
+		log.Println("[bbrpc dbg] resp:", string(r.result))
+	}
 	err := json.Unmarshal(r.result, v)
 	if err != nil {
 		err = fmt.Errorf("failed to parse rpc json response %s to %t, %v", string(r.result), v, err)
@@ -379,6 +382,10 @@ func (c *Client) sendCmd(method string, param interface{}) (chan *response, erro
 		ID:      id,
 		Method:  method,
 		Params:  rawParams,
+	}
+
+	if c.Debug {
+		log.Println("[bbrpc dbg] req:", method, string(req.Params))
 	}
 
 	marshalledJSON, err := json.Marshal(req)

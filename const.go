@@ -8,3 +8,5 @@ const (
 	TransactionTypeGenesis       = "genesis"
 	TransactionTypeCertification = "certification"
 )
+
+var Debug = false
