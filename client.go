@@ -250,6 +250,9 @@ func (c *Client) handleSendPostMessage(details *sendPostDetails) {
 		return
 	}
 
+	if c.Debug {
+		log.Println("[bbrpc dbg] resp", string(respBytes))
+	}
 	// Try to unmarshal the response as a regular JSON-RPC response.
 	var resp rawResponse
 	err = json.Unmarshal(respBytes, &resp)
@@ -348,9 +351,6 @@ func futureParse(f chan *response, v interface{}) error {
 	r := <-f
 	if r.err != nil {
 		return fmt.Errorf("RPC request return error: %v", r.err)
-	}
-	if Debug {
-		log.Println("[bbrpc dbg] resp:", string(r.result))
 	}
 	err := json.Unmarshal(r.result, v)
 	if err != nil {
