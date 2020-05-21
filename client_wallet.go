@@ -208,6 +208,19 @@ func (c *Client) Signtransaction(txdata string) (*SigntransactionResult, error) 
 	err = futureParse(resp, &ret)
 	return &ret, err
 }
+// Signrawtransactionwithwallet https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#signrawtransactionwithwallet
+func (c *Client) Signrawtransactionwithwallet(pubkey,txdata string) (*SigntransactionResult, error) {
+	resp, err := c.sendCmd("signrawtransactionwithwallet", struct {
+		Txdata string `json:"txdata"`
+		Pubkey string `json:"pubkey"`
+	}{Txdata: txdata, Pubkey: pubkey})
+	if err != nil {
+		return nil, err
+	}
+	var ret SigntransactionResult
+	err = futureParse(resp, &ret)
+	return &ret, err
+}
 
 // Validateaddress https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#validateaddress
 func (c *Client) Validateaddress(addr string) (*AddressInfo, error) {
