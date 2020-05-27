@@ -54,6 +54,11 @@ type TemplateData struct {
 		Delegate string `json:"delegate,omitempty"` //(string, required) delegate public key
 		Owner    string `json:"owner,omitempty"`    //(string, required) owner address
 	} `json:"delegate,omitempty"`
+	//   (if type=vote)
+	Vote *struct { //(object, required) delegate template struct
+		Delegate string `json:"delegate,omitempty"` //(string, required) delegate public key
+		Owner    string `json:"owner,omitempty"`    //(string, required) owner address
+	} `json:"vote,omitempty"`
 	//   (if type=fork)
 	Fork *struct { //(object, required) fork template struct
 		Redeem string `json:"redeem,omitempty"` //(string, required) redeem address
