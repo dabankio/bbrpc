@@ -95,7 +95,7 @@ type ConnConfig struct {
 // Client .
 type Client struct {
 	Debug bool //print some debug log when true
-	
+
 	id uint64 // atomic, so must stay 64-bit aligned
 	// config holds the connection configuration associated with this client.
 	config     *ConnConfig

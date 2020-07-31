@@ -84,6 +84,7 @@ func (c *Client) ListTransactionsSinceBlock(targetBlockHash string, count int) (
 // ListBlockDetailsSince 列出自某个区块以来的所有区块详情，不包含targetBlock的交易
 // return: topBlockHeight, blockDetails, error
 func (c *Client) ListBlockDetailsSince(fork *string, targetBlockHash string, count int) (int, []BlockDetail, error) {
+	// fmt.Println("[dbg]ListBlockDetailsSince", *fork, targetBlockHash, count)
 	const defaultRecentHeight = 30 //如果提供的hash为空，则取最近的n个块的交易
 
 	topForkHeight, err := c.Getforkheight(fork)
@@ -125,16 +126,47 @@ func (c *Client) ListBlockDetailsSince(fork *string, targetBlockHash string, cou
 			return topForkHeight, nil, fmt.Errorf("failed to get block hash @ [%d], result len: [%d], %v", prevBlockHeight, len(blockHash), err)
 		}
 
-		detail, err := c.Getblockdetail(blockHash[0])
-		if err != nil {
-			return topForkHeight, nil, fmt.Errorf("failed to get block detail @ [%s], %v", blockHash, err)
+		var lastHeight uint
+		for _, hash := range blockHash {
+			detail, err := c.Getblockdetail(hash)
+			if err != nil {
+				return topForkHeight, nil, fmt.Errorf("failed to get block detail @ [%s], %v", blockHash, err)
+			}
+			all = append(all, *detail)
+			lastHeight = detail.Height
 		}
-		all = append(all, *detail)
-
-		scannedBlockCount++
-		if detail.Height == uint(topForkHeight) || scannedBlockCount >= count {
+		if lastHeight == uint(topForkHeight) || scannedBlockCount >= count {
 			break
 		}
+		scannedBlockCount++
 	}
 	return topForkHeight, all, nil
+}
+
+// ListBlockDetailsBetween 列出[from,to]内所有区块详情
+// return: blockDetails, error
+func (c *Client) ListBlockDetailsBetween(fork *string, fromHeight, toHeight int) ([]BlockDetail, error) {
+	var all []BlockDetail
+	cursorHeight := fromHeight
+	for {
+		blockHash, err := c.Getblockhash(cursorHeight, fork)
+		if err != nil || len(blockHash) == 0 {
+			return nil, fmt.Errorf("failed to get block hash @ [%d], result len: [%d], %v", cursorHeight, len(blockHash), err)
+		}
+
+		var lastHeight uint
+		for _, hash := range blockHash {
+			detail, err := c.Getblockdetail(hash)
+			if err != nil {
+				return nil, fmt.Errorf("failed to get block detail @ [%s], %v", blockHash, err)
+			}
+			all = append(all, *detail)
+			lastHeight = detail.Height
+		}
+		if int(lastHeight) == toHeight {
+			break
+		}
+		cursorHeight++
+	}
+	return all, nil
 }
