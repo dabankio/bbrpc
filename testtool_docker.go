@@ -46,16 +46,15 @@ func CmdRunDockerDevCore(imageName string) (func(), DockerCore, error) {
 		return func() {}, info, err
 	}
 
-	shellCmd := fmt.Sprintf("docker run --rm -p 9550:%d %s", idlePort, imageName)
-
-	cmd := exec.Command(shellCmd)
-	err = cmd.Run()
-	if err != nil {
-		return func() {}, info, err
-	}
+	cmd := exec.Command("docker", "run", "-d", "--rm", "-p", fmt.Sprintf("9550:%d", idlePort), imageName)
+	runErr := cmd.Run()
 	outputBytes, err := cmd.CombinedOutput()
 	if err != nil {
 		return func() {}, info, err
+	}
+
+	if runErr != nil {
+		return func() {}, info, fmt.Errorf("%v, out:%v", runErr, string(outputBytes))
 	}
 	log.Println("[info] docker dev core started, container id: ", string(outputBytes))
 

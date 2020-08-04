@@ -65,6 +65,17 @@ func (c *Client) Getforkheight(fork *string) (h int, err error) {
 	return
 }
 
+func (c *Client) Listdelegate(count int) (ret []Delegate, error error) {
+	resp, err := c.sendCmd("listdelegate", struct {
+		Count int `json:"count"`
+	}{count})
+	if err != nil {
+		return nil, err
+	}
+	err = futureParse(resp, &ret)
+	return
+}
+
 // Listfork https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#listfork
 func (c *Client) Listfork(all bool) (ret []ForkProfile, err error) {
 	resp, err := c.sendCmd("listfork", struct {

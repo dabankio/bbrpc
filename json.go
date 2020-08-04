@@ -181,6 +181,12 @@ type ForkProfile struct {
 	Owner      string  `json:"owner,omitempty"`      //(string, required) owner's address
 }
 
+// Delegate .
+type Delegate struct {
+	Address string  `json:"address,omitempty"`
+	Votes   float64 `json:"votes,omitempty"`
+}
+
 // BlockInfo 块信息
 type BlockInfo struct {
 	Hash    string   `json:"hash"`    //(string, required) block hash

@@ -146,9 +146,12 @@ func TesttoolRunServerAndBeginMint(t *testing.T, opts ...RunBigBangOptions) (fun
 
 // 启动bigbang-server,创建一个client,调用testFn(client)
 func testClientMethod(t *testing.T, testFn func(*Client)) {
-	killBigBangServer, client, _ := TesttoolRunServerAndBeginMint(t)
-	defer killBigBangServer()
-	testFn(client)
+	// killBigBangServer, client, _ := TesttoolRunServerAndBeginMint(t)
+	// defer killBigBangServer()
+	// testFn(client)
+
+	info := MustDockerRunDevCore(t, "bbccore:0.4")
+	testFn(info.Client)
 }
 
 // 启动bigbang-server,创建一个client,调用testFn(client)
