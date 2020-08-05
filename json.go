@@ -262,6 +262,7 @@ type NoneSerializedTransaction struct {
 	Time          uint       `json:"time,omitempty"`          //(uint, required) transaction timestamp
 	Lockuntil     uint       `json:"lockuntil,omitempty"`     //(uint, required) unlock time
 	Anchor        string     `json:"anchor,omitempty"`        //(string, required) anchor hash
+	Blockhash     string     `json:"blockhash"`               //block hash
 	Sendfrom      string     `json:"sendfrom,omitempty"`      //(string, required) send from address
 	Sendto        string     `json:"sendto,omitempty"`        //(string, required) send to address
 	Amount        float64    `json:"amount,omitempty"`        //(double, required) amount
