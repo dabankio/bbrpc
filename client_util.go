@@ -27,6 +27,23 @@ func (c *Client) Getpubkeyaddress(pubkey string, reversal *string) (*string, err
 	return &data, err
 }
 
+// Listunspent https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#listunspent
+func (c *Client) Listunspent(address string, fork *string, max uint) (*UnspentTotal, error) {
+	resp, err := c.sendCmd("listunspent", struct {
+		Address string  `json:"address"`
+		Fork    *string `json:"fork,omitempty"`
+		Max     uint    `json:"max"`
+	}{
+		Address: address, Fork: fork, Max: max,
+	})
+	if err != nil {
+		return nil, err
+	}
+	var data UnspentTotal
+	err = futureParse(resp, &data)
+	return &data, err
+}
+
 // Makekeypair https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#makekeypair
 func (c *Client) Makekeypair() (*Keypair, error) {
 	resp, err := c.sendCmd("makekeypair", nil)

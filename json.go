@@ -2,6 +2,8 @@ package bbrpc
 
 import (
 	"encoding/json"
+
+	"github.com/shopspring/decimal"
 )
 
 // Request is a type for raw JSON-RPC 1.0 requests.  The Method field identifies
@@ -293,4 +295,20 @@ type PeerInfo struct {
 	Inbound  bool   `json:"inbound,omitempty"`  //(bool, required) accept multiple connection or not
 	Height   int    `json:"height,omitempty"`   //(int, required) starting height
 	Banscore int    `json:"banscore,omitempty"` //(int, required) ban score
+}
+
+// UnspentTotal .
+type UnspentTotal struct {
+	Total     decimal.Decimal `json:"total,omitempty"`
+	Addresses []struct {
+		Address  string `json:"address,omitempty"`
+		Unspents []struct {
+			Txid      string          `json:"txid,omitempty"`
+			Out       uint            `json:"out,omitempty"`
+			Amount    decimal.Decimal `json:"amount,omitempty"`
+			Time      int64           `json:"time,omitempty"`
+			Lockuntil int64           `json:"lockuntil,omitempty"`
+		} `json:"unspents,omitempty"`
+		Sum decimal.Decimal `json:"sum,omitempty"`
+	} `json:"addresses,omitempty"`
 }
