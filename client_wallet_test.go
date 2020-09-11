@@ -60,7 +60,7 @@ func TestClient_Importkey(t *testing.T) {
 		// export key: 0979c39f614d7d32074b8d1d73ea690ec0f35944dde728e2a4f372cf8457005601000000aaca6c71d4f72cbad55ae8a698f813deb2f8d6706db8114a3c6f7553790142f869c79867b5c1fb33ea0946747400c9f90c271b1f35061026cd2c82c0
 
 		pubkey := "0979c39f614d7d32074b8d1d73ea690ec0f35944dde728e2a4f372cf8457005601000000aaca6c71d4f72cbad55ae8a698f813deb2f8d6706db8114a3c6f7553790142f869c79867b5c1fb33ea0946747400c9f90c271b1f35061026cd2c82c0"
-		key, err := c.Importkey(pubkey)
+		key, err := c.Importkey(pubkey, nil)
 		tShouldNil(t, err)
 		fmt.Println("importkey ", key, err)
 

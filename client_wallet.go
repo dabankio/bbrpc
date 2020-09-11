@@ -85,10 +85,11 @@ func (c *Client) Gettransaction(txid string, serialized *bool) (*TransactionDeta
 }
 
 // Importkey https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#importkey
-func (c *Client) Importkey(pubkey string) (string, error) {
+func (c *Client) Importkey(pubkey string, syncTx *bool) (string, error) {
 	resp, err := c.sendCmd("importkey", struct {
 		Pubkey string `json:"pubkey"`
-	}{pubkey})
+		Synctx *bool  `json:"synctx,omitempty"`
+	}{pubkey, syncTx})
 	if err != nil {
 		return "", err
 	}
