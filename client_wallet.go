@@ -99,11 +99,12 @@ func (c *Client) Importkey(pubkey string, syncTx *bool) (string, error) {
 }
 
 // Importprivkey https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#importprivkey
-func (c *Client) Importprivkey(privkey, passphrase string) (*string, error) {
+func (c *Client) Importprivkey(privkey, passphrase string, syncTx *bool) (*string, error) {
 	resp, err := c.sendCmd("importprivkey", struct {
 		Privkey    string `json:"privkey"`
 		Passphrase string `json:"passphrase"`
-	}{Privkey: privkey, Passphrase: passphrase})
+		Synctx *bool `json:"synctx,omitempty"`
+	}{Privkey: privkey, Passphrase: passphrase: Synctx: syncTx})
 	if err != nil {
 		return nil, err
 	}
