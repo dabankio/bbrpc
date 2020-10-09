@@ -359,6 +359,19 @@ func futureParse(f chan *response, v interface{}) error {
 	return err
 }
 
+// CallJSONRPC any rpc
+func (c *Client) CallJSONRPC(method string, params map[string]interface{}, result interface{}) ([]byte, error) {
+	resp, err := c.sendCmd(method, params)
+	if err != nil {
+		return nil, err
+	}
+	if result != nil {
+		return nil, futureParse(resp, &result)
+	}
+	r := <-resp
+	return r.result, r.err
+}
+
 // sendCmd sends the passed command to the associated server and returns a
 // response channel on which the reply will be delivered at some point in the
 // future.  It handles both websocket and HTTP POST mode depending on the
