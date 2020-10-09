@@ -13,7 +13,7 @@ func TestClient_Importprivkey(t *testing.T) {
 
 		count := len(listk)
 
-		_, err = c.Importprivkey("514025fb4b6d6bdb15d4521d047d20ace5311fa10e2e8889adbd262f93dc673b", "123")
+		_, err = c.Importprivkey("514025fb4b6d6bdb15d4521d047d20ace5311fa10e2e8889adbd262f93dc673b", "123", nil)
 		tShouldNil(t, err)
 
 		listk, err = c.Listkey()
@@ -45,7 +45,7 @@ func TestClient_Exportkey(t *testing.T) {
 
 		fmt.Printf("pair: %#v\n", p)
 
-		_, err = c.Importprivkey(p.Privkey, "123")
+		_, err = c.Importprivkey(p.Privkey, "123", nil)
 		tShouldNil(t, err)
 
 		key, err := c.Exportkey(p.Pubkey)

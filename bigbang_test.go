@@ -14,7 +14,7 @@ func TestSimpleSendfromWithData(t *testing.T) {
 	tShouldNil(t, Wait4balanceReach(templateAddress, 100, client))
 
 	a := TAddr0
-	_, err := client.Importprivkey(a.Privkey, _tPassphrase)
+	_, err := client.Importprivkey(a.Privkey, _tPassphrase, nil)
 	tShouldNil(t, err)
 	_, err = client.Unlockkey(a.Pubkey, _tPassphrase, nil)
 	tShouldNil(t, err)
@@ -60,7 +60,7 @@ func TestSimpleSignTX(t *testing.T) {
 	tShouldNil(t, Wait4balanceReach(templateAddress, 100, client))
 
 	a := TAddr0
-	_, err := client.Importprivkey(a.Privkey, _tPassphrase)
+	_, err := client.Importprivkey(a.Privkey, _tPassphrase, nil)
 	tShouldNil(t, err)
 	_, err = client.Unlockkey(a.Pubkey, _tPassphrase, nil)
 	tShouldNil(t, err)
@@ -282,7 +282,7 @@ func TestMultiVinTx(t *testing.T) {
 	Wait4nBlocks(1, client)
 
 	for _, k := range []AddrKeypair{TAddr0, TAddr1} {
-		ret, err := client.Importprivkey(k.Privkey, _tPassphrase)
+		ret, err := client.Importprivkey(k.Privkey, _tPassphrase, nil)
 		tShouldNil(t, err)
 		tShouldTrue(t, ret != nil)
 		tShouldNotContains(t, *ret, "error")
@@ -382,7 +382,7 @@ func TestMultisigSingleNode(t *testing.T) {
 	// 从多签地址将资金转出
 	a0, a1, a2 := TAddr0, TAddr1, TAddr2
 	for _, a := range []AddrKeypair{a0, a1, a2} {
-		_, err := client.Importprivkey(a.Privkey, _tPassphrase)
+		_, err := client.Importprivkey(a.Privkey, _tPassphrase, nil)
 		tShouldNil(t, err)
 
 		_, err = client.Unlockkey(a.Pubkey, _tPassphrase, nil)
@@ -449,7 +449,7 @@ func TestMultisig2Node_11(t *testing.T) {
 			node ClusterNode
 			add  AddrKeypair
 		}{{n0, a0}, {n1, a1}} {
-			_, err := imp.node.Client.Importprivkey(imp.add.Privkey, _tPassphrase)
+			_, err := imp.node.Client.Importprivkey(imp.add.Privkey, _tPassphrase, nil)
 			tShouldNil(t, err)
 
 			_, err = imp.node.Client.Unlockkey(imp.add.Pubkey, _tPassphrase, nil)
@@ -547,7 +547,7 @@ func TestMultisig2Node_20(t *testing.T) {
 
 	{ //导入地址
 		for _, add := range []AddrKeypair{a0, a1} {
-			_, err := n0.Client.Importprivkey(add.Privkey, _tPassphrase)
+			_, err := n0.Client.Importprivkey(add.Privkey, _tPassphrase, nil)
 			tShouldNil(t, err)
 			_, err = n0.Client.Unlockkey(add.Pubkey, _tPassphrase, nil)
 			tShouldNil(t, err)

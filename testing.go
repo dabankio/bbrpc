@@ -125,8 +125,8 @@ func TesttoolRunServerAndBeginMint(t *testing.T, opts ...RunBigBangOptions) (fun
 	tShouldNil(t, err, "failed to new rpc client")
 
 	{
-		_, _ = client.Importprivkey(TCryptonightAddr.Privkey, _tPassphrase)
-		_, _ = client.Importprivkey(TCryptonightKey.Privkey, _tPassphrase) //这个无需导入，配置已有，导入反而报错
+		_, _ = client.Importprivkey(TCryptonightAddr.Privkey, _tPassphrase, nil)
+		_, _ = client.Importprivkey(TCryptonightKey.Privkey, _tPassphrase, nil) //这个无需导入，配置已有，导入反而报错
 		_, _ = client.Unlockkey(TCryptonightAddr.Pubkey, _tPassphrase, nil)
 		_, _ = client.Unlockkey(TCryptonightKey.Pubkey, _tPassphrase, nil)
 	}

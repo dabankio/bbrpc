@@ -104,7 +104,7 @@ func (c *Client) Importprivkey(privkey, passphrase string, syncTx *bool) (*strin
 		Privkey    string `json:"privkey"`
 		Passphrase string `json:"passphrase"`
 		Synctx *bool `json:"synctx,omitempty"`
-	}{Privkey: privkey, Passphrase: passphrase: Synctx: syncTx})
+	}{Privkey: privkey, Passphrase: passphrase, Synctx: syncTx})
 	if err != nil {
 		return nil, err
 	}
