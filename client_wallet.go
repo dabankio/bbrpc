@@ -212,11 +212,11 @@ func (c *Client) Signtransaction(txdata string) (*SigntransactionResult, error) 
 }
 
 // Signrawtransactionwithwallet https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#signrawtransactionwithwallet
-func (c *Client) Signrawtransactionwithwallet(pubkey, txdata string) (*SigntransactionResult, error) {
+func (c *Client) Signrawtransactionwithwallet(addrIn, txdata string) (*SigntransactionResult, error) {
 	resp, err := c.sendCmd("signrawtransactionwithwallet", struct {
 		Txdata string `json:"txdata"`
-		Pubkey string `json:"pubkey"`
-	}{Txdata: txdata, Pubkey: pubkey})
+		AddrIn string `json:"addrIn"`
+	}{Txdata: txdata, AddrIn: addrIn})
 	if err != nil {
 		return nil, err
 	}
