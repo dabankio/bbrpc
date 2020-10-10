@@ -103,7 +103,7 @@ func (c *Client) Importprivkey(privkey, passphrase string, syncTx *bool) (*strin
 	resp, err := c.sendCmd("importprivkey", struct {
 		Privkey    string `json:"privkey"`
 		Passphrase string `json:"passphrase"`
-		Synctx *bool `json:"synctx,omitempty"`
+		Synctx     *bool  `json:"synctx,omitempty"`
 	}{Privkey: privkey, Passphrase: passphrase, Synctx: syncTx})
 	if err != nil {
 		return nil, err
@@ -177,14 +177,16 @@ func (c *Client) Listtransaction(count *uint, offset *int) ([]Transaction, error
 
 // CmdSendfrom .
 type CmdSendfrom struct {
-	To     string   `json:"to"`               //(string, required) to address
-	From   string   `json:"from"`             //(string, required) from address
-	Amount float64  `json:"amount"`           //(double, required) amount
-	Txfee  *float64 `json:"txfee,omitempty"`  //(double, optional) transaction fee
-	Fork   *string  `json:"fork,omitempty"`   //(string, optional) fork hash
-	Data   *string  `json:"data,omitempty"`   //(string, optional) output data
-	SignM  *string  `json:"sign_m,omitempty"` //(string, optional) exchange sign m
-	SignS  *string  `json:"sign_s,omitempty"` //(string, optional) exchange sign s
+	From       string   `json:"from"`                 //(string, required) from address
+	To         string   `json:"to"`                   //(string, required) to address
+	Amount     float64  `json:"amount"`               //(double, required) amount
+	Txfee      *float64 `json:"txfee,omitempty"`      //(double, optional) transaction fee
+	Fork       *string  `json:"fork,omitempty"`       //(string, optional) fork hash
+	Data       *string  `json:"data,omitempty"`       //(string, optional) output data
+	SignM      *string  `json:"sign_m,omitempty"`     //(string, optional) exchange sign m
+	SignS      *string  `json:"sign_s,omitempty"`     //(string, optional) exchange sign s
+	Sendtodata *string  `json:"sendtodata,omitempty"` //(string, optional) If the 'to' address of transaction is a template, this option allows to save the template hex data. The hex data is equal output of RPC 'exporttemplate'
+	Type       *uint    `json:"type,omitempty"`       //(uint, optional, default=0) 0: common token tx, 2: defi relation tx
 }
 
 // Sendfrom https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#sendfrom
