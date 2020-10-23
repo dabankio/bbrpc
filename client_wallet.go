@@ -103,7 +103,7 @@ func (c *Client) Importprivkey(privkey, passphrase string, syncTx *bool) (*strin
 	resp, err := c.sendCmd("importprivkey", struct {
 		Privkey    string `json:"privkey"`
 		Passphrase string `json:"passphrase"`
-		Synctx *bool `json:"synctx,omitempty"`
+		Synctx     *bool  `json:"synctx,omitempty"`
 	}{Privkey: privkey, Passphrase: passphrase, Synctx: syncTx})
 	if err != nil {
 		return nil, err
@@ -127,10 +127,11 @@ func (c *Client) Importtemplate(data string) (*string, error) {
 }
 
 // Importpubkey https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#importpubkey
-func (c *Client) Importpubkey(pubkey string) (*string, error) {
+func (c *Client) Importpubkey(pubkey string, syncTx *bool) (*string, error) {
 	resp, err := c.sendCmd("importpubkey", struct {
 		Pubkey string `json:"pubkey"`
-	}{pubkey})
+		Synctx *bool  `json:"synctx,omitempty"`
+	}{pubkey, syncTx})
 	if err != nil {
 		return nil, err
 	}
