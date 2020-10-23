@@ -103,7 +103,7 @@ func (c *Client) Importprivkey(privkey, passphrase string, syncTx *bool) (*strin
 	resp, err := c.sendCmd("importprivkey", struct {
 		Privkey    string `json:"privkey"`
 		Passphrase string `json:"passphrase"`
-		Synctx *bool `json:"synctx,omitempty"`
+		Synctx     *bool  `json:"synctx,omitempty"`
 	}{Privkey: privkey, Passphrase: passphrase, Synctx: syncTx})
 	if err != nil {
 		return nil, err
