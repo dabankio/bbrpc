@@ -236,9 +236,9 @@ func (c *Client) handleSendPostMessage(details *sendPostDetails) {
 	jReq := details.jsonRequest
 	// log.Printf("Sending post [%s] with id %d, json: %s", jReq.method, jReq.id, string(jReq.marshalledJSON))
 	httpResponse, err := c.httpClient.Do(details.httpRequest)
-	if httpResponse != nil {
-		defer httpResponse.Body.Close()
-	}
+	// if httpResponse != nil {
+	// 	defer httpResponse.Body.Close()
+	// }
 	if err != nil {
 		jReq.responseChan <- &response{err: err}
 		return
@@ -246,7 +246,7 @@ func (c *Client) handleSendPostMessage(details *sendPostDetails) {
 
 	// Read the raw bytes and close the response.
 	respBytes, err := ioutil.ReadAll(httpResponse.Body)
-	// httpResponse.Body.Close()
+	httpResponse.Body.Close()
 	if err != nil {
 		err = fmt.Errorf("error reading json reply: %v", err)
 		jReq.responseChan <- &response{err: err}
