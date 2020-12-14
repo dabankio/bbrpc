@@ -133,6 +133,17 @@ func (p AddnewtemplateParamMint) TemplateType() string { return "mint" }
 // ParamName .
 func (p AddnewtemplateParamMint) ParamName() string { return "mint" }
 
+// AddnewtemplateParamDexBBCMap .
+type AddnewtemplateParamDexBBCMap struct {
+	Owner    string `json:"owner,omitempty"`    //(string, required) owner address
+}
+
+// TemplateType .
+func (p AddnewtemplateParamDexBBCMap) TemplateType() string { return "dexbbcmap" }
+
+// ParamName .
+func (p AddnewtemplateParamDexBBCMap) ParamName() string { return "dexbbcmap" }
+
 // AddnewtemplateParamDelegate .
 type AddnewtemplateParamDelegate struct {
 	Delegate string `json:"delegate,omitempty"` //(string, required) delegate public key
