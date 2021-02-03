@@ -93,6 +93,9 @@ type TemplateData struct {
 			Weight int64  `json:"weight,omitempty"` //(int, required) weight
 		} `json:"pubkey,omitempty"`
 	} `json:"weighted,omitempty"`
+	Dexbbcmap *struct {
+		Owner string `json:"owner"`
+	} `json:"dexbbcmap,omitempty"`
 }
 
 // AddressData .

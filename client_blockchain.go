@@ -1,5 +1,7 @@
 package bbrpc
 
+import "errors"
+
 // Getblockcount https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#getblockcount
 func (c *Client) Getblockcount(fork *string) (*int, error) {
 	resp, err := c.sendCmd("getblockcount", struct {
@@ -13,6 +15,17 @@ func (c *Client) Getblockcount(fork *string) (*int, error) {
 	return &height, err
 }
 
+// GetblockByHeight .
+func (c *Client) GetblockByHeight(height uint64, fork *string) (*BlockInfo, error) {
+	hash, err := c.Getblockhash(int(height), fork)
+	if err != nil {
+		return nil, err
+	}
+	if len(hash) == 0 {
+		return nil, errors.New("no block hashs")
+	}
+	return c.Getblock(hash[0])
+}
 // Getblock https://github.com/bigbangcore/BigBang/wiki/JSON-RPC#getblock
 func (c *Client) Getblock(hash string) (*BlockInfo, error) {
 	resp, err := c.sendCmd("getblock", struct {
